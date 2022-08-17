@@ -1,7 +1,6 @@
-package com.olivergraham.clockit.data
+package com.olivergraham.clockit.feature_activity.data
 
 import androidx.room.*
-import com.olivergraham.clockit.domain.model.Activity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,7 +13,7 @@ interface ActivityDao {
     fun getAllActivities(): Flow<List<ActivityEntity>>
 
     @Query("SELECT * FROM activity_table WHERE id = :activityId LIMIT 1")
-    fun getAnActivity(activityId: Int): ActivityEntity
+    fun getActivityById(activityId: Int): ActivityEntity?
 
     @Update
     suspend fun updateActivity(activity: ActivityEntity)

@@ -1,10 +1,16 @@
 package com.olivergraham.clockit.dependency_injection
 
+
 import android.app.Application
 import androidx.room.Room
-import com.olivergraham.clockit.data.ActivityDatabase
-import com.olivergraham.clockit.data.ActivityRepositoryImplementation
-import com.olivergraham.clockit.domain.repository.ActivityRepository
+import com.olivergraham.clockit.feature_activity.data.ActivityDatabase
+import com.olivergraham.clockit.feature_activity.data.ActivityRepositoryImplementation
+import com.olivergraham.clockit.feature_activity.domain.repository.ActivityRepository
+import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import com.olivergraham.clockit.feature_activity.domain.use_case.AddActivity
+import com.olivergraham.clockit.feature_activity.domain.use_case.DeleteActivity
+import com.olivergraham.clockit.feature_activity.domain.use_case.GetActivities
+import com.olivergraham.clockit.feature_activity.domain.use_case.GetActivity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,5 +36,16 @@ object AppModule {
     @Provides
     fun provideActivityRepository(db: ActivityDatabase): ActivityRepository {
         return ActivityRepositoryImplementation(db.dao)
+    }
+
+    @Singleton
+    @Provides
+    fun provideActivityUseCases(repository: ActivityRepository): ActivityUseCases {
+        return ActivityUseCases(
+            addActivity = AddActivity(repository),
+            deleteActivity = DeleteActivity(repository),
+            getActivities = GetActivities(repository),
+            getActivity = GetActivity(repository),
+        )
     }
 }
