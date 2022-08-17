@@ -1,4 +1,4 @@
-package com.olivergraham.clockit.presentation
+package com.olivergraham.clockit.feature_activity.presentation.activities
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel

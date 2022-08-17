@@ -1,4 +1,4 @@
-package com.olivergraham.clockit.data
+package com.olivergraham.clockit.feature_activity.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

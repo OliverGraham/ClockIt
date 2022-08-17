@@ -1,5 +1,5 @@
-package com.olivergraham.clockit.data
-import com.olivergraham.clockit.domain.model.Activity
+package com.olivergraham.clockit.feature_activity.data
+import com.olivergraham.clockit.feature_activity.domain.model.Activity
 
 
 fun ActivityEntity.toActivity(): Activity {

@@ -1,4 +1,4 @@
-package com.olivergraham.clockit
+package com.olivergraham.clockit.feature_activity.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
