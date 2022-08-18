@@ -4,12 +4,14 @@ import com.olivergraham.clockit.feature_activity.domain.model.Activity
 
 fun ActivityEntity.toActivity(): Activity {
     return Activity(
-        name = name
+        name = name,
+        color = color
     )
 }
 
 fun Activity.toActivityEntity(): ActivityEntity {
     return ActivityEntity(
-        name = name
+        name = name,
+        color = color
     )
 }
