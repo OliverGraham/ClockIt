@@ -1,7 +1,9 @@
 package com.olivergraham.clockit.feature_activity.presentation.add_edit_activity
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,13 +24,13 @@ class AddEditActivityViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _activityTitle = mutableStateOf(ActivityTextFieldState(
+    var activityTextFieldState by mutableStateOf(ActivityTextFieldState(
         hint = "Enter name of your activity"
     ))
-    val activityTitle: State<ActivityTextFieldState> = _activityTitle
+        private set
 
-    private val _activityColor = mutableStateOf(Activity.activityColors.random().toArgb())
-    val activityColor: State<Int> = _activityColor
+    var activityColor by mutableStateOf(Activity.activityColors.random().toArgb())
+        private set
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -41,33 +43,69 @@ class AddEditActivityViewModel @Inject constructor(
 
     private fun initializeActivity(savedStateHandle: SavedStateHandle) {
         savedStateHandle.get<Int>("activityId")?.let { activityId ->
-            if (activityId != -1) {
-                viewModelScope.launch {
-                    activityUseCases.getActivity(activityId)?.also { activity ->
-                        currentActivityId = activity.id
-                        _activityTitle.value = activityTitle.value.copy(
-                            text = activity.name,
-                            isHintVisible = false
-                        )
-                        _activityColor.value = activity.color
-                    }
+            if (activityId == -1) {
+                return
+            }
+            viewModelScope.launch { ->
+                activityUseCases.getActivity(activityId)?.also { activity ->
+                    setScreenActivity(activity)
                 }
             }
         }
     }
 
+    private fun setScreenActivity(activity: Activity) {
+        currentActivityId = activity.id
+        activityTextFieldState = activityTextFieldState.copy(
+            text = activity.name,
+            isHintVisible = false
+        )
+        activityColor = activity.color
+    }
+
+    private fun setActivityTextFieldName(newText: String) {
+        activityTextFieldState = activityTextFieldState.copy(
+            text = newText
+        )
+    }
+
+    private fun setActivityTextFieldFocusState(focusState: FocusState) {
+        activityTextFieldState = activityTextFieldState.copy(
+            isHintVisible = !focusState.isFocused &&
+                    activityTextFieldState.text.isBlank()
+        )
+    }
+
+    private fun manageSaveActivity() {
+        viewModelScope.launch {
+            try {
+                activityUseCases.addActivity(
+                    Activity(
+                        name = activityTextFieldState.text,
+                        //timestamp = System.currentTimeMillis(),
+                        color = activityColor,
+                        id = currentActivityId
+                    )
+                )
+                _eventFlow.emit(UiEvent.SaveActivity)
+            } catch (e: InvalidActivityException) {
+                _eventFlow.emit(
+                    UiEvent.ShowSnackbar(
+                        message = e.message ?: "Couldn't save activity"
+                    )
+                )
+            }
+        }
+    }
+
+
     fun onEvent(event: AddEditActivityEvent) {
         when (event) {
             is AddEditActivityEvent.EnteredTitle -> {
-                _activityTitle.value = activityTitle.value.copy(
-                    text = event.value
-                )
+                setActivityTextFieldName(event.value)
             }
             is AddEditActivityEvent.ChangeTitleFocus -> {
-                _activityTitle.value = activityTitle.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            activityTitle.value.text.isBlank()
-                )
+                setActivityTextFieldFocusState(event.focusState)
             }
             /*is AddEditNoteEvent.EnteredContent -> {
                 _noteContent.value = _noteContent.value.copy(
@@ -81,32 +119,10 @@ class AddEditActivityViewModel @Inject constructor(
                 )
             }*/
             is AddEditActivityEvent.ChangeColor -> {
-                _activityColor.value = event.color
+                activityColor = event.color
             }
             is AddEditActivityEvent.SaveActivity -> {
                 manageSaveActivity()
-            }
-        }
-    }
-
-    private fun manageSaveActivity() {
-        viewModelScope.launch {
-            try {
-                activityUseCases.addActivity(
-                    Activity(
-                        name = activityTitle.value.text,
-                        //timestamp = System.currentTimeMillis(),
-                        color = activityColor.value,
-                        id = currentActivityId
-                    )
-                )
-                _eventFlow.emit(UiEvent.SaveActivity)
-            } catch (e: InvalidActivityException) {
-                _eventFlow.emit(
-                    UiEvent.ShowSnackbar(
-                        message = e.message ?: "Couldn't save activity"
-                    )
-                )
             }
         }
     }

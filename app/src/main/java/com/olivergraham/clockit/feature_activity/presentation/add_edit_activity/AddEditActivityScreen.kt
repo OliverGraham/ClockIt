@@ -26,15 +26,17 @@ fun AddEditActivityScreen(
     activityColor: Int,
     viewModel: AddEditActivityViewModel = hiltViewModel()
 ) {
-    val titleState = viewModel.activityTitle.value
+    val titleState = viewModel.activityTextFieldState
     val activityBackgroundAnimatable = remember {
         Animatable(
-            Color(if (activityColor != -1) activityColor else viewModel.activityColor.value)
+            Color(if (activityColor != -1) activityColor else viewModel.activityColor)
         )
     }
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-    CollectEvents(viewModel.eventFlow, snackBarHostState, navController)
+
+    ObserveUiEvents(viewModel.eventFlow, snackBarHostState, navController)
 
     Scaffold(
         floatingActionButton = { SaveFab(
@@ -76,7 +78,7 @@ fun AddEditActivityScreen(
 
 
 @Composable
-private fun CollectEvents(
+private fun ObserveUiEvents(
     eventFlow: SharedFlow<AddEditActivityViewModel.UiEvent>,
     snackBarState: SnackbarHostState,
     navController: NavController
