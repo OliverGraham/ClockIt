@@ -1,18 +1,60 @@
 package com.olivergraham.clockit.feature_activity.presentation.activities
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class ActivityViewModel(): ViewModel() {
 
+@HiltViewModel
+class ActivityViewModel @Inject constructor(
+    private val activityUseCases: ActivityUseCases
+): ViewModel() {
+
+    private val _state = mutableStateOf(ActivityState())
+    val state: State<ActivityState> = _state
+
+    private var getActivityJob: Job? = null
+
+    init {
+        getActivities()
+    }
+
+    fun onEvent(event: ActivityEvent) {
+        when (event) {
+            is ActivityEvent.ClockIn -> {
+
+            }
+            else -> {}
+        }
+    }
+
+    private fun getActivities() {
+        getActivityJob?.cancel()
+        getActivityJob = activityUseCases.getActivities()
+            .onEach { activities ->
+                _state.value = state.value.copy(
+                    activities = activities
+                )
+            }
+            .launchIn(viewModelScope)
+    }
+    // or just this?
+    // var state by mutableStateOf(ActivityState())
 
     // in LazyColumn
     //      onEvent = viewModel::onEvent
 
     // one-time events
-    var state by mutableStateOf(ActivityState())
+
     //private val _uiEvent = Channel<ActivityEvent>()
 
     // To use Date

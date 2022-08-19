@@ -27,7 +27,8 @@ import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,8 +44,8 @@ fun AddEditActivityScreen(
         )
     }
     val scope = rememberCoroutineScope()
-
-    CollectEvents(viewModel.eventFlow, navController)
+    val snackBarHostState = remember { SnackbarHostState() }
+    CollectEvents(viewModel.eventFlow, snackBarHostState, navController)
 
     Scaffold(
         floatingActionButton = {
@@ -57,6 +58,7 @@ fun AddEditActivityScreen(
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save activity")
             }
         },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { padding ->
         Column(modifier = Modifier
             .fillMaxSize()
@@ -121,13 +123,16 @@ fun AddEditActivityScreen(
 @Composable
 private fun CollectEvents(
     eventFlow: SharedFlow<AddEditActivityViewModel.UiEvent>,
+    snackBarState: SnackbarHostState,
     navController: NavController
 ) {
     LaunchedEffect(key1 = true) {
         eventFlow.collectLatest { event ->
             when (event) {
                 is AddEditActivityViewModel.UiEvent.ShowSnackbar -> {
-                    // show snackbar, material three style?
+                    snackBarState.showSnackbar(
+                        message = event.message
+                    )
                 }
                 is AddEditActivityViewModel.UiEvent.SaveActivity -> {
                     navController.navigateUp()
