@@ -15,7 +15,8 @@ fun ActivityFab(
         onClick = {
             onClick()
         },
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+
     ) {
         Icon(imageVector = Icons.Default.Add, contentDescription = "Add activity")
     }
