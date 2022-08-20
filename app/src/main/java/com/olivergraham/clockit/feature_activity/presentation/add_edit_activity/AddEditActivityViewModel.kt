@@ -35,10 +35,10 @@ class AddEditActivityViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var currentActivityId: Int? = null
+    // private var currentActivityId: Int? = null
 
     init {
-        initializeActivity(savedStateHandle)
+        // initializeActivity(savedStateHandle)
     }
 
     private fun initializeActivity(savedStateHandle: SavedStateHandle) {
@@ -55,7 +55,7 @@ class AddEditActivityViewModel @Inject constructor(
     }
 
     private fun setScreenActivity(activity: Activity) {
-        currentActivityId = activity.id
+        // currentActivityId = activity.id
         activityTextFieldState = activityTextFieldState.copy(
             text = activity.name,
             isHintVisible = false
@@ -84,7 +84,7 @@ class AddEditActivityViewModel @Inject constructor(
                         name = activityTextFieldState.text,
                         //timestamp = System.currentTimeMillis(),
                         color = activityColor,
-                        id = currentActivityId
+                        //id = currentActivityId
                     )
                 )
                 _eventFlow.emit(UiEvent.SaveActivity)

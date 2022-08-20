@@ -7,10 +7,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import com.olivergraham.clockit.feature_activity.domain.utility.getCurrentDateTime
+import com.olivergraham.clockit.feature_activity.domain.utility.toString
+import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.AddEditActivityViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -24,6 +30,9 @@ class ActivityViewModel @Inject constructor(
 
     private var getActivityJob: Job? = null
 
+    private val _eventFlow = MutableSharedFlow<ActivityViewModel.UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     init {
         getActivities()
     }
@@ -31,6 +40,17 @@ class ActivityViewModel @Inject constructor(
     fun onEvent(event: ActivityEvent) {
         when (event) {
             is ActivityEvent.ClockIn -> {
+                viewModelScope.launch { ->
+
+                    val date = getCurrentDateTime()
+
+                    val activity = event.activity.copy(
+                        mostRecentClockIn = date.toString(),
+                        isClockedIn = true
+                    )
+                    activityUseCases.updateActivity(activity)
+                    _eventFlow.emit(UiEvent.ClockIn)
+                }
 
             }
             else -> {}
@@ -47,6 +67,12 @@ class ActivityViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
+
+    sealed class UiEvent {
+        data class ShowSnackbar(val message: String): UiEvent()
+        object ClockIn: UiEvent()
+    }
+
     // or just this?
     // var state by mutableStateOf(ActivityState())
 

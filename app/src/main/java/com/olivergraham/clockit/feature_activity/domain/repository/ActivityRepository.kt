@@ -12,5 +12,7 @@ interface ActivityRepository {
     suspend fun getActivityById(id: Int): Activity?
 
     fun getAllActivities(): Flow<List<Activity>>
+
+    suspend fun updateActivity(activity: Activity)
 }
 

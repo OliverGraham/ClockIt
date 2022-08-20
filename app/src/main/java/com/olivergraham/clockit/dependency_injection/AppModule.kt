@@ -6,11 +6,7 @@ import androidx.room.Room
 import com.olivergraham.clockit.feature_activity.data.ActivityDatabase
 import com.olivergraham.clockit.feature_activity.data.ActivityRepositoryImplementation
 import com.olivergraham.clockit.feature_activity.domain.repository.ActivityRepository
-import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
-import com.olivergraham.clockit.feature_activity.domain.use_case.AddActivity
-import com.olivergraham.clockit.feature_activity.domain.use_case.DeleteActivity
-import com.olivergraham.clockit.feature_activity.domain.use_case.GetActivities
-import com.olivergraham.clockit.feature_activity.domain.use_case.GetActivity
+import com.olivergraham.clockit.feature_activity.domain.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,6 +42,7 @@ object AppModule {
             deleteActivity = DeleteActivity(repository),
             getActivities = GetActivities(repository),
             getActivity = GetActivity(repository),
+            updateActivity = UpdateActivity(repository)
         )
     }
 }

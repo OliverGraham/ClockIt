@@ -26,4 +26,8 @@ class ActivityRepositoryImplementation(
             activities.map { it.toActivity() }
         }
     }
+
+    override suspend fun updateActivity(activity: Activity) {
+        dao.updateActivity(activity.toActivityEntity())
+    }
 }

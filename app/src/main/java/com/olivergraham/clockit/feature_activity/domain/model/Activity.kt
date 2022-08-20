@@ -8,6 +8,9 @@ data class Activity(
     val name: String = "Unnamed Activity",
     // val timeSpent: Date = getCurrentDateTime(),
     val color: Int,
+    val isClockedIn: Boolean = false,
+    val mostRecentClockIn: String = "",
+    val timeSpent: Double = 0.0,
     val id: Int? = null
 ) {
     companion object {

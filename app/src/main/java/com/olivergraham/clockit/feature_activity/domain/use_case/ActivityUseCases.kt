@@ -4,5 +4,6 @@ data class ActivityUseCases(
     val addActivity: AddActivity,
     val deleteActivity: DeleteActivity,
     val getActivities: GetActivities,
-    val getActivity: GetActivity
+    val getActivity: GetActivity,
+    val updateActivity: UpdateActivity
 )

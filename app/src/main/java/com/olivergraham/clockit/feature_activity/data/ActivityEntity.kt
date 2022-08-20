@@ -7,5 +7,8 @@ import androidx.room.PrimaryKey
 data class ActivityEntity(
     val name: String,
     val color: Int,
-    @PrimaryKey val id: Int? = null
+    val isClockedIn: Boolean,
+    val mostRecentClockIn: String,
+    val timeSpent: Double,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null
 )

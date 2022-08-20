@@ -1,21 +1,16 @@
 package com.olivergraham.clockit.feature_activity.presentation.activities
 
-// import androidx.compose.material3.rememberScaffoldState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
@@ -28,7 +23,10 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.presentation.activities.components.ActivityFab
+import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.AddEditActivityViewModel
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.absoluteValue
 
 
@@ -38,7 +36,6 @@ fun ActivityScreen(
     navController: NavController,
     activityViewModel: ActivityViewModel = hiltViewModel()
 ) {
-
     val state = activityViewModel.state.value
     val scope = rememberCoroutineScope()
 
@@ -53,10 +50,40 @@ fun ActivityScreen(
     ) { padding ->
 
         Column(modifier = Modifier.fillMaxSize()) { ->
-            ActivitiesViewPager(padding, state.activities)
+            ActivitiesViewPager(
+                padding = padding,
+                activities =  state.activities,
+                clockIn = { activity ->
+                    activityViewModel.onEvent(ActivityEvent.ClockIn(activity = activity))
+                },
+                clockOut = { activity ->
+                    activityViewModel.onEvent(ActivityEvent.ClockOut(activity = activity))
+                }
+
+            )
         }
     }
 }
+
+@Composable
+private fun ObserveUiEvents(
+    eventFlow: SharedFlow<ActivityViewModel.UiEvent>,
+    // snackBarState: SnackbarHostState,
+    navController: NavController
+) {
+    LaunchedEffect(key1 = true) { ->
+        eventFlow.collectLatest { event ->
+            when (event) {
+                is ActivityViewModel.UiEvent.ClockIn -> {
+                   /* snackBarState.showSnackbar(
+                        message = event.message
+                    )*/
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun TopAppBar() {
@@ -78,7 +105,12 @@ private fun TopAppBar() {
  * */
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun ActivitiesViewPager(padding: PaddingValues, activities: List<Activity>) {
+private fun ActivitiesViewPager(
+    padding: PaddingValues,
+    activities: List<Activity>,
+    clockIn: (activity: Activity) -> Unit,
+    clockOut: (activity: Activity) -> Unit
+) {
 
     // PaddingValues(end = 64.dp)) will show the next page's number
     HorizontalPager(
@@ -105,8 +137,9 @@ private fun ActivitiesViewPager(padding: PaddingValues, activities: List<Activit
                 }.value
             }
         ) { ->
-            val name = remember { activities[pageNumber].name }
-            val color = remember { activities[pageNumber].color }
+            val currentActivity = activities[pageNumber]
+            val name = currentActivity.name
+            val color = currentActivity.color
             Column(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,15 +149,24 @@ private fun ActivitiesViewPager(padding: PaddingValues, activities: List<Activit
                     .fillMaxHeight(0.85f)
                     .background(color = Color(color))
             ) { ->
-                Text(text = name, style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = currentActivity.mostRecentClockIn,
+                    style = MaterialTheme.typography.headlineSmall
+                )
 
-                Column() { ->
-                    LargeButton(text = "Clock In", onClick = { /*TODO*/ })
+                Column { ->
+                    LargeButton(text = "Clock In", onClick = {
+                        clockIn(currentActivity)
+                    })
                     Spacer(modifier = Modifier.padding(6.dp))
-                    LargeButton(text = "Clock Out", onClick = { /*TODO*/ })
+                    LargeButton(text = "Clock Out", onClick = { clockOut(currentActivity) })
 
                 }
-                Column() { ->
+                Column{ ->
                     LargeButton(text = "Delete", onClick = { /*TODO*/ })
                 }
 
