@@ -1,15 +1,11 @@
 package com.olivergraham.clockit.feature_activity.presentation.activities
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
-import com.olivergraham.clockit.feature_activity.domain.utility.getCurrentDateTime
-import com.olivergraham.clockit.feature_activity.domain.utility.toString
-import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.AddEditActivityViewModel
+import com.olivergraham.clockit.feature_activity.presentation.utility.getCurrentDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow

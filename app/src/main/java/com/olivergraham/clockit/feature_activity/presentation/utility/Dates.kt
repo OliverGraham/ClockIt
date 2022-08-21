@@ -1,4 +1,4 @@
-package com.olivergraham.clockit.feature_activity.domain.utility
+package com.olivergraham.clockit.feature_activity.presentation.utility
 
 import java.text.SimpleDateFormat
 import java.util.*
