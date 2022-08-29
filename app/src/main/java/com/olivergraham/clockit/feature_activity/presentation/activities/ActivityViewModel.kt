@@ -26,7 +26,7 @@ class ActivityViewModel @Inject constructor(
 
     private var getActivityJob: Job? = null
 
-    private val _eventFlow = MutableSharedFlow<ActivityViewModel.UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
@@ -45,11 +45,20 @@ class ActivityViewModel @Inject constructor(
                         isClockedIn = true
                     )
                     activityUseCases.updateActivity(activity)
-                    _eventFlow.emit(UiEvent.ClockIn)
+                    // _eventFlow.emit(UiEvent.ClockIn)
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked in at $date"))
                 }
 
             }
-            else -> {}
+            is ActivityEvent.ClockOut -> {
+                viewModelScope.launch { ->
+                    val date = getCurrentDateTime()
+                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked out at $date"))
+                }
+            }
+            else -> {
+                val stop = 0
+            }
         }
     }
 

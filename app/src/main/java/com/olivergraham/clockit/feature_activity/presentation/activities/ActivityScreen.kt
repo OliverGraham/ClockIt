@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -36,9 +37,13 @@ fun ActivityScreen(
     activityViewModel: ActivityViewModel = hiltViewModel()
 ) {
     val state = activityViewModel.state.value
-    val scope = rememberCoroutineScope()
+    // val scope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    ObserveUiEvents(activityViewModel.eventFlow, snackBarHostState)
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState) } ,
         floatingActionButton = {
             ActivityFab(
                 onClick = { navController.navigate(Screen.AddEditActivityScreen.route) }
@@ -67,8 +72,7 @@ fun ActivityScreen(
 @Composable
 private fun ObserveUiEvents(
     eventFlow: SharedFlow<ActivityViewModel.UiEvent>,
-    // snackBarState: SnackbarHostState,
-    navController: NavController
+    snackBarState: SnackbarHostState
 ) {
     LaunchedEffect(key1 = true) { ->
         eventFlow.collectLatest { event ->
@@ -78,6 +82,12 @@ private fun ObserveUiEvents(
                         message = event.message
                     )*/
                 }
+                is ActivityViewModel.UiEvent.ShowSnackbar -> {
+                    snackBarState.showSnackbar(
+                        message = event.message
+                    )
+                }
+                else -> {}
             }
         }
     }
@@ -136,42 +146,11 @@ private fun ActivitiesViewPager(
                 }.value
             }
         ) { ->
-            val currentActivity = activities[pageNumber]
-            val name = currentActivity.name
-            val color = currentActivity.color
-            Column(
-                verticalArrangement = Arrangement.SpaceAround,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    //.fillMaxSize()
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.85f)
-                    .background(color = Color(color))
-            ) { ->
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = currentActivity.mostRecentClockIn,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-
-                Column { ->
-                    LargeButton(text = "Clock In", onClick = {
-                        clockIn(currentActivity)
-                    })
-                    Spacer(modifier = Modifier.padding(6.dp))
-                    LargeButton(text = "Clock Out", onClick = { clockOut(currentActivity) })
-
-                }
-                Column{ ->
-                    LargeButton(text = "Delete", onClick = { /*TODO*/ })
-                }
-
-            }
-
-
+            ActivityCardContent(
+                activity = activities[pageNumber],
+                clockIn = clockIn,
+                clockOut = clockOut
+            )
         }
     }
 }
@@ -191,16 +170,41 @@ private fun LargeButton(
 }
 
 @Composable
-private fun ActivityPageContent() {
-    // backgroundColor
+private fun ActivityCardContent(
+    activity: Activity,
+    clockIn: (activity: Activity) -> Unit,
+    clockOut: (activity: Activity) -> Unit
+) {
 
-    // Name of Activity
-    // Icon??
-    // Clock In
+    Column(
+        verticalArrangement = Arrangement.SpaceAround,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            //.fillMaxSize()
+            .fillMaxWidth()
+            .fillMaxHeight(0.85f)
+            .background(color = Color(activity.color))
+    ) { ->
+        Text(
+            text = activity.name,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Text(
+            text = activity.mostRecentClockIn,
+            style = MaterialTheme.typography.headlineSmall
+        )
 
-    // Clock Out
-    // Time spent
-    // Calendar?
+        Column { ->
+            LargeButton(text = "Clock In", onClick = { clockIn(activity) })
+            Spacer(modifier = Modifier.padding(6.dp))
+            LargeButton(text = "Clock Out", onClick = { clockOut(activity) })
+
+        }
+        Column{ ->
+            LargeButton(text = "Delete", onClick = { /*TODO*/ })
+        }
+
+    }
 }
 
 
