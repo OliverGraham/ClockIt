@@ -56,7 +56,8 @@ fun ActivityScreen(
         Column(modifier = Modifier.fillMaxSize()) { ->
             ActivitiesViewPager(
                 padding = padding,
-                activities =  state.activities,
+                activities = state.activities,
+                clockedInActivity = state.currentlyClockedInActivityId,
                 clockIn = { activity ->
                     activityViewModel.onEvent(ActivityEvent.ClockIn(activity = activity))
                 },
@@ -117,6 +118,7 @@ private fun TopAppBar() {
 private fun ActivitiesViewPager(
     padding: PaddingValues,
     activities: List<Activity>,
+    clockedInActivity: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit
 ) {
@@ -148,6 +150,7 @@ private fun ActivitiesViewPager(
         ) { ->
             ActivityCardContent(
                 activity = activities[pageNumber],
+                clockedInActivity = clockedInActivity,
                 clockIn = clockIn,
                 clockOut = clockOut
             )
@@ -158,11 +161,13 @@ private fun ActivitiesViewPager(
 @Composable
 private fun LargeButton(
     text: String,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     ElevatedButton(
         modifier = Modifier
             .size(width = 180.dp, height = 45.dp),
+        enabled = enabled,
         onClick = { onClick() }
     ) { ->
         Text(text = text)
@@ -172,6 +177,7 @@ private fun LargeButton(
 @Composable
 private fun ActivityCardContent(
     activity: Activity,
+    clockedInActivity: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit
 ) {
@@ -195,9 +201,17 @@ private fun ActivityCardContent(
         )
 
         Column { ->
-            LargeButton(text = "Clock In", onClick = { clockIn(activity) })
+            LargeButton(
+                text = "Clock In",
+                enabled = clockedInActivity == null,
+                onClick = { clockIn(activity) }
+            )
             Spacer(modifier = Modifier.padding(6.dp))
-            LargeButton(text = "Clock Out", onClick = { clockOut(activity) })
+            LargeButton(
+                text = "Clock Out",
+                enabled = activity.id == clockedInActivity,
+                onClick = { clockOut(activity) }
+            )
 
         }
         Column{ ->
@@ -208,7 +222,7 @@ private fun ActivityCardContent(
 }
 
 
-/** Start at 85% below top of screen and animate to 100% */
+/** Necessary animation for paging? */
 private fun animateXAndY(pageOffset: Float): Dp {
     return lerp(
         start = 0.95f.dp,
@@ -217,7 +231,7 @@ private fun animateXAndY(pageOffset: Float): Dp {
     )
 }
 
-/** Animate alpha between 50% and 100% */
+/** Animate alpha */
 private fun animateAlpha(pageOffset: Float): Dp {
     return lerp(
         start = 0.95f.dp,

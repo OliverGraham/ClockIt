@@ -5,5 +5,6 @@ import com.olivergraham.clockit.feature_activity.domain.model.Activity
 data class ActivityState(
     val activities: List<Activity> = emptyList(),
    // val activityOrder: ActivityOrder = ActivityOrder.Date(OrderType.Descending),
-    val isOrderSectionVisible: Boolean = false
+    val isOrderSectionVisible: Boolean = false,
+    val currentlyClockedInActivityId: Int? = null
 )

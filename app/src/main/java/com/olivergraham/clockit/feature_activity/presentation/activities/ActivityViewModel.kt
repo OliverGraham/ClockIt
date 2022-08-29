@@ -45,6 +45,9 @@ class ActivityViewModel @Inject constructor(
                         isClockedIn = true
                     )
                     activityUseCases.updateActivity(activity)
+                    _state.value = state.value.copy(
+                        currentlyClockedInActivityId = event.activity.id
+                    )
                     // _eventFlow.emit(UiEvent.ClockIn)
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked in at $date"))
                 }
@@ -53,9 +56,15 @@ class ActivityViewModel @Inject constructor(
             is ActivityEvent.ClockOut -> {
                 viewModelScope.launch { ->
                     val date = getCurrentDateTime()
+                    _state.value = state.value.copy(
+                        currentlyClockedInActivityId = null
+                    )
                     _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked out at $date"))
                 }
             }
+            /*is ActivityEvent.ToggleClockedIn -> {
+
+            }*/
             else -> {
                 val stop = 0
             }
