@@ -57,7 +57,7 @@ fun ActivityScreen(
             ActivitiesViewPager(
                 padding = padding,
                 activities = state.activities,
-                clockedInActivity = state.currentlyClockedInActivityId,
+                clockedInActivity = state.clockedInActivityId,
                 clockIn = { activity ->
                     activityViewModel.onEvent(ActivityEvent.ClockIn(activity = activity))
                 },

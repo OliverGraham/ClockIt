@@ -11,8 +11,6 @@ sealed class ActivityEvent {
     data class ClockIn(val activity: Activity): ActivityEvent()
     data class ClockOut(val activity: Activity): ActivityEvent()
 
-    // object ToggleClockedIn: ActivityEvent()
-
     data class Navigate(val route: String): ActivityEvent()
     data class ShowSnackBar(
         val message: String,
