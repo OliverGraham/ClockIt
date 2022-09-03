@@ -9,6 +9,6 @@ data class ActivityEntity(
     val color: Int,
     val isClockedIn: Boolean,
     val mostRecentClockIn: String,
-    val timeSpent: Double,
+    val timeSpent: Long,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
 )

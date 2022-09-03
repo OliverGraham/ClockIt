@@ -3,6 +3,8 @@ package com.olivergraham.clockit.feature_activity.presentation.add_edit_activity
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.components.ColorCircleRow
-import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.components.SaveFab
 import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.components.TransparentHintTextField
+import com.olivergraham.clockit.feature_activity.presentation.common_components.Fab
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -39,7 +41,9 @@ fun AddEditActivityScreen(
     ObserveUiEvents(viewModel.eventFlow, snackBarHostState, navController)
 
     Scaffold(
-        floatingActionButton = { SaveFab(
+        floatingActionButton = { Fab(
+            icon = Icons.Default.Save,
+            contentDescription = "Save activity",
             onClick = { viewModel.onEvent(AddEditActivityEvent.SaveActivity) })
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }

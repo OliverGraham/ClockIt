@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
-import com.olivergraham.clockit.feature_activity.presentation.utility.getCurrentDateTime
+import com.olivergraham.clockit.feature_activity.common.Dates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,34 +36,55 @@ class ActivityViewModel @Inject constructor(
     fun onEvent(event: ActivityEvent) {
         when (event) {
             is ActivityEvent.ClockIn -> {
-                viewModelScope.launch { ->
-
-                    val date = getCurrentDateTime()
-
-                    val activity = event.activity.copy(
-                        mostRecentClockIn = date.toString(),
-                        isClockedIn = true
-                    )
-                    activityUseCases.updateActivity(activity)
-                    _state.value = state.value.copy(
-                        clockedInActivityId = event.activity.id
-                    )
-                    // _eventFlow.emit(UiEvent.ClockIn)
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked in at $date"))
-                }
-
+                performClockIn(event)
             }
             is ActivityEvent.ClockOut -> {
-                viewModelScope.launch { ->
-                    val date = getCurrentDateTime()
-                    _state.value = state.value.copy(
-                        clockedInActivityId = null
-                    )
-                    _eventFlow.emit(UiEvent.ShowSnackbar(message = "Clocked out at $date"))
-                }
+                performClockOut(event)
             }
             else -> {
             }
+        }
+    }
+
+    private fun performClockIn(event: ActivityEvent.ClockIn) {
+        viewModelScope.launch { ->
+
+            val date = Dates.getCurrentTime()
+
+            val activity = event.activity.copy(
+                mostRecentClockIn = date.toString(),
+                isClockedIn = true
+            )
+
+            activityUseCases.updateActivity(activity)
+            _state.value = state.value.copy(
+                clockedInActivityId = event.activity.id
+            )
+
+            _eventFlow.emit(
+                UiEvent.ShowSnackbar(message = "Clocked in at ${Dates.dateToString(date)}")
+            )
+        }
+    }
+
+
+    private fun performClockOut(event: ActivityEvent.ClockOut) {
+        viewModelScope.launch { ->
+
+            val activity = event.activity.copy(
+                timeSpent = Dates.calculateTimeSpent(
+                    event.activity.mostRecentClockIn, event.activity.timeSpent
+                ),
+                isClockedIn = false
+            )
+            activityUseCases.updateActivity(activity)
+
+            _state.value = state.value.copy(
+                clockedInActivityId = null
+            )
+            _eventFlow.emit(UiEvent.ShowSnackbar(
+                message = "Clocked out at ${Dates.getCurrentTimeAsString()}")
+            )
         }
     }
 
@@ -82,20 +103,6 @@ class ActivityViewModel @Inject constructor(
         data class ShowSnackbar(val message: String): UiEvent()
         object ClockIn: UiEvent()
     }
-
-    // or just this?
-    // var state by mutableStateOf(ActivityState())
-
-    // in LazyColumn
-    //      onEvent = viewModel::onEvent
-
-    // one-time events
-
-    //private val _uiEvent = Channel<ActivityEvent>()
-
-    // To use Date
-    /*val date = getCurrentDateTime()
-    val dateInString = date.toString("yyyy/MM/dd HH:mm:ss")*/
 
     //
     /*fun onEvent(event: TodoListEvent) {

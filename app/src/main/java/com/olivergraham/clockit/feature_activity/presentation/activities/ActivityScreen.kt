@@ -7,13 +7,12 @@ import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
@@ -23,7 +22,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
-import com.olivergraham.clockit.feature_activity.presentation.activities.components.ActivityFab
+import com.olivergraham.clockit.feature_activity.presentation.common_components.Fab
+import com.olivergraham.clockit.feature_activity.presentation.common_components.LargeButton
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -45,7 +45,8 @@ fun ActivityScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) } ,
         floatingActionButton = {
-            ActivityFab(
+            Fab(
+                contentDescription = "Add activity",
                 onClick = { navController.navigate(Screen.AddEditActivityScreen.route) }
             )
         },
@@ -64,7 +65,6 @@ fun ActivityScreen(
                 clockOut = { activity ->
                     activityViewModel.onEvent(ActivityEvent.ClockOut(activity = activity))
                 }
-
             )
         }
     }
@@ -159,45 +159,38 @@ private fun ActivitiesViewPager(
 }
 
 @Composable
-private fun LargeButton(
-    text: String,
-    enabled: Boolean = true,
-    onClick: () -> Unit
-) {
-    ElevatedButton(
-        modifier = Modifier
-            .size(width = 180.dp, height = 45.dp),
-        enabled = enabled,
-        onClick = { onClick() }
-    ) { ->
-        Text(text = text)
-    }
-}
-
-@Composable
 private fun ActivityCardContent(
     activity: Activity,
     clockedInActivity: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit
 ) {
-
     Column(
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            //.fillMaxSize()
+            // .fillMaxSize()
             .fillMaxWidth()
             .fillMaxHeight(0.85f)
             .background(color = Color(activity.color))
     ) { ->
+
         Text(
             text = activity.name,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center
         )
+
         Text(
-            text = activity.mostRecentClockIn,
-            style = MaterialTheme.typography.headlineSmall
+            text = "Last clock in:\n${activity.mostRecentClockInAsLabel()}",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Text(
+            text = "Total time spent:\n${activity.timeSpentAsLabel()}",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
         )
 
         Column { ->
@@ -214,8 +207,11 @@ private fun ActivityCardContent(
             )
 
         }
-        Column{ ->
-            LargeButton(text = "Delete", onClick = { /*TODO*/ })
+        Column { ->
+            LargeButton(text = "Delete", onClick = {
+                /* TODO: delete and show an undo in SnackBar */
+                }
+            )
         }
 
     }
