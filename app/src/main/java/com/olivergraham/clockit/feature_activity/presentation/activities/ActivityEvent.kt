@@ -6,15 +6,16 @@ import java.time.LocalDateTime
 // Send events from UI to view model
 sealed class ActivityEvent {
 
-    object PopBackStack: ActivityEvent()
-
     data class ClockIn(val activity: Activity): ActivityEvent()
     data class ClockOut(val activity: Activity): ActivityEvent()
+    data class NavigateToEditScreen(val route: String): ActivityEvent()
+    data class DeleteActivity(val activity: Activity): ActivityEvent()
 
-    data class Navigate(val route: String): ActivityEvent()
+    /*
+    object PopBackStack: ActivityEvent()
     data class ShowSnackBar(
         val message: String,
         val time: LocalDateTime
     ): ActivityEvent()
-    data class OnSomeButtonTap(val someInfo: String): ActivityEvent()
+    data class OnSomeButtonTap(val someInfo: String): ActivityEvent()*/
 }

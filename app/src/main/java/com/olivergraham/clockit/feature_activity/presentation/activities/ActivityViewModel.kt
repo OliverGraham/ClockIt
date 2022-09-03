@@ -41,8 +41,13 @@ class ActivityViewModel @Inject constructor(
             is ActivityEvent.ClockOut -> {
                 performClockOut(event)
             }
-            else -> {
+            /*is ActivityEvent.NavigateToEditScreen -> {
+                performNavigateToEditScreen(event)
             }
+            is ActivityEvent.DeleteActivity -> {
+                performDeleteActivity(event)
+            }*/
+            else -> {}
         }
     }
 
@@ -57,6 +62,7 @@ class ActivityViewModel @Inject constructor(
             )
 
             activityUseCases.updateActivity(activity)
+
             _state.value = state.value.copy(
                 clockedInActivityId = event.activity.id
             )
@@ -88,6 +94,12 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
+    private fun performNavigateToEditScreen(event: ActivityEvent.NavigateToEditScreen) {
+        viewModelScope.launch { ->
+
+        }
+    }
+
     private fun getActivities() {
         getActivityJob?.cancel()
         getActivityJob = activityUseCases.getActivities()
@@ -101,6 +113,7 @@ class ActivityViewModel @Inject constructor(
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String): UiEvent()
+        data class Navigate(val message: String): UiEvent()
         object ClockIn: UiEvent()
     }
 

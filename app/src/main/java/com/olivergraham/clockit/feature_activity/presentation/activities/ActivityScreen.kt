@@ -3,10 +3,12 @@ package com.olivergraham.clockit.feature_activity.presentation.activities
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +66,12 @@ fun ActivityScreen(
                 },
                 clockOut = { activity ->
                     activityViewModel.onEvent(ActivityEvent.ClockOut(activity = activity))
+                },
+                navigateWithActivity = { activity ->
+                    navController.navigate(
+                        route = Screen.AddEditActivityScreen.route +
+                                "?activityId=${activity.id}&activityColor=${activity.color}"
+                    )
                 }
             )
         }
@@ -120,7 +128,8 @@ private fun ActivitiesViewPager(
     activities: List<Activity>,
     clockedInActivity: Int?,
     clockIn: (activity: Activity) -> Unit,
-    clockOut: (activity: Activity) -> Unit
+    clockOut: (activity: Activity) -> Unit,
+    navigateWithActivity: (activity: Activity) -> Unit
 ) {
 
     // PaddingValues(end = 64.dp)) will show the next page's number
@@ -152,7 +161,8 @@ private fun ActivitiesViewPager(
                 activity = activities[pageNumber],
                 clockedInActivity = clockedInActivity,
                 clockIn = clockIn,
-                clockOut = clockOut
+                clockOut = clockOut,
+                navigateWithActivity = navigateWithActivity
             )
         }
     }
@@ -163,7 +173,8 @@ private fun ActivityCardContent(
     activity: Activity,
     clockedInActivity: Int?,
     clockIn: (activity: Activity) -> Unit,
-    clockOut: (activity: Activity) -> Unit
+    clockOut: (activity: Activity) -> Unit,
+    navigateWithActivity: (activity: Activity) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceAround,
@@ -174,6 +185,13 @@ private fun ActivityCardContent(
             .fillMaxHeight(0.85f)
             .background(color = Color(activity.color))
     ) { ->
+
+        CardHeader(
+            activity = activity,
+            onEdit = {},
+            onDelete = {},
+            navigateWithActivity = navigateWithActivity
+        )
 
         Text(
             text = activity.name,
@@ -214,6 +232,41 @@ private fun ActivityCardContent(
             )
         }
 
+    }
+}
+
+@Composable
+private fun CardHeader(
+    activity: Activity,
+    onEdit: (activity: Activity) -> Unit,
+    onDelete: (activity: Activity) -> Unit,
+    navigateWithActivity: (activity: Activity) -> Unit
+) {
+    val expanded = remember { mutableStateOf(value = false) }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround
+    ) { ->
+        Text(
+            text = activity.name,
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center
+        )
+        IconButton(onClick = { expanded.value = true }) {
+            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Options button")
+        }
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false}
+        ) { ->
+            DropdownMenuItem(
+                text = { Text("Edit Activity") },
+                onClick = { navigateWithActivity(activity) }
+            )
+            DropdownMenuItem(
+                text = { Text("Delete Activity") },
+                onClick = { /*TODO*/ }
+            )
+        }
     }
 }
 
