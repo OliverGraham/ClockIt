@@ -16,7 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.olivergraham.clockit.feature_activity.presentation.activities.ActivityScreen
 import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.AddEditActivityScreen
+import com.olivergraham.clockit.feature_activity.presentation.utility.Navigation
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
+import com.olivergraham.clockit.feature_activity.presentation.utility.navigateToEditScreenRouteTemplate
 import com.olivergraham.clockit.ui.theme.ClockItTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,11 +51,10 @@ private fun MainContent() {
             ActivityScreen(navController = navController)
         }
         composable(
-            route = Screen.AddEditActivityScreen.route +
-                    "?activityId={activityId}&activityColor={activityColor}",
+            route = navController.navigateToEditScreenRouteTemplate(),
             arguments = getAddEditScreenArguments()
         ) { navBackStackEntry ->
-            val color = navBackStackEntry.arguments?.getInt("activityColor") ?: -1
+            val color = navBackStackEntry.arguments?.getInt(Navigation.getActivityColorKey()) ?: -1
             AddEditActivityScreen(
                 navController = navController,
                 activityColor = color
@@ -62,18 +63,16 @@ private fun MainContent() {
     }
 }
 
-// TODO: deal with the string routes... yikes
-
 private fun getAddEditScreenArguments(): List<NamedNavArgument> {
     return listOf(
         navArgument(
-            name = "activityId"
+            name = Navigation.getActivityIdKey()
         ) { ->
             type = NavType.IntType
             defaultValue = -1
         },
         navArgument(
-            name = "activityColor"
+            name = Navigation.getActivityColorKey()
         ) { ->
             type = NavType.IntType
             defaultValue = -1

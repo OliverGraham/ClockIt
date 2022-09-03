@@ -12,11 +12,13 @@ import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.model.InvalidActivityException
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import com.olivergraham.clockit.feature_activity.presentation.utility.getActivityId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -26,46 +28,41 @@ class AddEditActivityViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _activityTextFieldState = mutableStateOf(ActivityTextFieldState(
+    var activityTextFieldState by mutableStateOf(ActivityTextFieldState(
         hint = "Enter name of your activity"
     ))
-    val activityTextFieldState: State<ActivityTextFieldState> = _activityTextFieldState
+        private set
 
-    /*var activityTextFieldState by mutableStateOf(ActivityTextFieldState(
-        hint = "Enter name of your activity"
-    ))
-        private set*/
-
-    private val _activityColor = mutableStateOf(Activity.activityColors.random().toArgb())
-    val activityColor: State<Int> = _activityColor
-
-    /*var activityColor by mutableStateOf(Activity.activityColors.random().toArgb())
-        private set*/
+    var activityColor by mutableStateOf(Activity.activityColors.random().toArgb())
+        private set
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    // private var currentActivityId: Int? = null
+    private var currentActivityId: Int? = null
 
     init {
         initializeActivity()
     }
 
     private fun initializeActivity() {
-        savedStateHandle.get<Int>("activityId")?.let { activityId ->
-            if (activityId == -1) {
-                return
-            }
-            viewModelScope.launch(Dispatchers.IO) { ->
-                activityUseCases.getActivity(activityId)?.also { activity ->
-                    setScreenActivity(activity)
+        savedStateHandle.getActivityId()?.let { activityId ->
+            if (activityId != -1) {
+                viewModelScope.launch { ->
+
+                    val theActivity = withContext(Dispatchers.IO) { ->
+                        activityUseCases.getActivity(activityId)
+                    }
+                    if (theActivity != null) {
+                        setScreenActivity(theActivity)
+                    }
                 }
             }
         }
     }
 
     private fun setScreenActivity(activity: Activity) {
-        // currentActivityId = activity.id
+        currentActivityId = activity.id
         activityTextFieldState = activityTextFieldState.copy(
             text = activity.name,
             isHintVisible = false
@@ -92,9 +89,8 @@ class AddEditActivityViewModel @Inject constructor(
                 activityUseCases.addActivity(
                     Activity(
                         name = activityTextFieldState.text,
-                        //timestamp = System.currentTimeMillis(),
                         color = activityColor,
-                        //id = currentActivityId
+                        id = currentActivityId
                     )
                 )
                 _eventFlow.emit(UiEvent.SaveActivity)

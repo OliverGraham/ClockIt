@@ -27,6 +27,7 @@ import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.presentation.common_components.Fab
 import com.olivergraham.clockit.feature_activity.presentation.common_components.LargeButton
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
+import com.olivergraham.clockit.feature_activity.presentation.utility.navigateWithActivity
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.absoluteValue
@@ -68,10 +69,7 @@ fun ActivityScreen(
                     activityViewModel.onEvent(ActivityEvent.ClockOut(activity = activity))
                 },
                 navigateWithActivity = { activity ->
-                    navController.navigate(
-                        route = Screen.AddEditActivityScreen.route +
-                                "?activityId=${activity.id}&activityColor=${activity.color}"
-                    )
+                    navController.navigateWithActivity(activity = activity)
                 }
             )
         }
@@ -188,15 +186,8 @@ private fun ActivityCardContent(
 
         CardHeader(
             activity = activity,
-            onEdit = {},
             onDelete = {},
             navigateWithActivity = navigateWithActivity
-        )
-
-        Text(
-            text = activity.name,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
         )
 
         Text(
@@ -238,7 +229,6 @@ private fun ActivityCardContent(
 @Composable
 private fun CardHeader(
     activity: Activity,
-    onEdit: (activity: Activity) -> Unit,
     onDelete: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
 ) {
@@ -259,11 +249,11 @@ private fun CardHeader(
             onDismissRequest = { expanded.value = false}
         ) { ->
             DropdownMenuItem(
-                text = { Text("Edit Activity") },
+                text = { Text(text = "Edit Activity") },
                 onClick = { navigateWithActivity(activity) }
             )
             DropdownMenuItem(
-                text = { Text("Delete Activity") },
+                text = { Text(text = "Delete Activity") },
                 onClick = { /*TODO*/ }
             )
         }
