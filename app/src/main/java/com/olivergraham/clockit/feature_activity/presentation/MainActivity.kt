@@ -18,6 +18,7 @@ import com.olivergraham.clockit.feature_activity.presentation.activities.Activit
 import com.olivergraham.clockit.feature_activity.presentation.add_edit_activity.AddEditActivityScreen
 import com.olivergraham.clockit.feature_activity.presentation.utility.Navigation
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
+import com.olivergraham.clockit.feature_activity.presentation.utility.getColor
 import com.olivergraham.clockit.feature_activity.presentation.utility.navigateToEditScreenRouteTemplate
 import com.olivergraham.clockit.ui.theme.ClockItTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,10 +55,9 @@ private fun MainContent() {
             route = navController.navigateToEditScreenRouteTemplate(),
             arguments = getAddEditScreenArguments()
         ) { navBackStackEntry ->
-            val color = navBackStackEntry.arguments?.getInt(Navigation.getActivityColorKey()) ?: -1
             AddEditActivityScreen(
                 navController = navController,
-                activityColor = color
+                activityColor = navBackStackEntry.getColor()
             )
         }
     }

@@ -8,7 +8,7 @@ sealed class ActivityEvent {
 
     data class ClockIn(val activity: Activity): ActivityEvent()
     data class ClockOut(val activity: Activity): ActivityEvent()
-    data class NavigateToEditScreen(val route: String): ActivityEvent()
+    // data class NavigateToEditScreen(val activity: Activity): ActivityEvent()
     data class DeleteActivity(val activity: Activity): ActivityEvent()
 
     /*

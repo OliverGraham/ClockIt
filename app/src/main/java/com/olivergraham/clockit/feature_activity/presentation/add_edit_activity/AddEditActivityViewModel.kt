@@ -40,6 +40,7 @@ class AddEditActivityViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentActivityId: Int? = null
+    private var currentActivity: Activity? = null
 
     init {
         initializeActivity()
@@ -50,12 +51,10 @@ class AddEditActivityViewModel @Inject constructor(
             if (activityId != -1) {
                 viewModelScope.launch { ->
 
-                    val theActivity = withContext(Dispatchers.IO) { ->
+                    currentActivity = withContext(Dispatchers.IO) { ->
                         activityUseCases.getActivity(activityId)
                     }
-                    if (theActivity != null) {
-                        setScreenActivity(theActivity)
-                    }
+                    currentActivity?.let { setScreenActivity(it) }
                 }
             }
         }
@@ -84,15 +83,9 @@ class AddEditActivityViewModel @Inject constructor(
     }
 
     private fun manageSaveActivity() {
-        viewModelScope.launch {
+        viewModelScope.launch { ->
             try {
-                activityUseCases.addActivity(
-                    Activity(
-                        name = activityTextFieldState.text,
-                        color = activityColor,
-                        id = currentActivityId
-                    )
-                )
+                if (currentActivity == null) saveActivity() else updateActivity()
                 _eventFlow.emit(UiEvent.SaveActivity)
             } catch (e: InvalidActivityException) {
                 _eventFlow.emit(
@@ -102,6 +95,27 @@ class AddEditActivityViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun updateActivity() {
+        currentActivity?.let { activity ->
+            activityUseCases.updateActivity(
+                activity.copy(
+                    name = activityTextFieldState.text,
+                    color = activityColor
+                )
+            )
+        }
+    }
+
+    private suspend fun saveActivity() {
+        activityUseCases.addActivity(
+            Activity(
+                name = activityTextFieldState.text,
+                color = activityColor,
+                id = currentActivityId
+            )
+        )
     }
 
 
