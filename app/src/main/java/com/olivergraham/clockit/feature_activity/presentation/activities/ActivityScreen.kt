@@ -6,10 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +37,21 @@ fun ActivityScreen(
     activityViewModel: ActivityViewModel = hiltViewModel()
 ) {
     val state = activityViewModel.state.value
-    // val scope = rememberCoroutineScope()
+    val activities = state.activities
+
+    // determine if an activity is already clocked in
+    /*val clockedInActivityId = remember { mutableStateOf(value = -1) }
+    for (activity in activities) {
+        if (activity.isClockedIn) {
+            clockedInActivityId.value = activity.id!!
+            break
+        }
+    }*/
+
+    val clockedInActivity by remember(activities) {
+        derivedStateOf { activities.firstOrNull { activity -> activity.isClockedIn } }
+    }
+
     val snackBarHostState = remember { SnackbarHostState() }
 
     ObserveUiEvents(activityViewModel.eventFlow, snackBarHostState)
@@ -60,8 +71,8 @@ fun ActivityScreen(
         Column(modifier = Modifier.fillMaxSize()) { ->
             ActivitiesViewPager(
                 padding = padding,
-                activities = state.activities,
-                clockedInActivity = state.clockedInActivityId,
+                activities = activities,
+                clockedInActivityId = clockedInActivity?.id,
                 clockIn = { activity ->
                     activityViewModel.onEvent(ActivityEvent.ClockIn(activity = activity))
                 },
@@ -104,8 +115,8 @@ private fun ObserveUiEvents(
 @Composable
 private fun TopAppBar() {
     CenterAlignedTopAppBar(
-        title = { Text("Clock it") },
-        actions = {
+        title = { Text(text = "Clock it") },
+        actions = { ->
             IconButton(onClick = { /* doSomething() */ }) {
                 Icon(
                     imageVector = Icons.Filled.Reorder,
@@ -116,6 +127,7 @@ private fun TopAppBar() {
     )
 }
 
+
 /**
  * This is the dipping-style pager
  * */
@@ -124,11 +136,12 @@ private fun TopAppBar() {
 private fun ActivitiesViewPager(
     padding: PaddingValues,
     activities: List<Activity>,
-    clockedInActivity: Int?,
+    clockedInActivityId: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
 ) {
+
 
     // PaddingValues(end = 64.dp)) will show the next page's number
     HorizontalPager(
@@ -136,7 +149,7 @@ private fun ActivitiesViewPager(
         contentPadding = PaddingValues(start = 64.dp, end = 64.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .wrapContentHeight() //and this
+            .wrapContentHeight()
             .fillMaxWidth(),
 
     ) { pageNumber ->
@@ -157,7 +170,7 @@ private fun ActivitiesViewPager(
         ) { ->
             ActivityCardContent(
                 activity = activities[pageNumber],
-                clockedInActivity = clockedInActivity,
+                clockedInActivityId = clockedInActivityId,
                 clockIn = clockIn,
                 clockOut = clockOut,
                 navigateWithActivity = navigateWithActivity
@@ -169,7 +182,7 @@ private fun ActivitiesViewPager(
 @Composable
 private fun ActivityCardContent(
     activity: Activity,
-    clockedInActivity: Int?,
+    clockedInActivityId: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
@@ -178,9 +191,8 @@ private fun ActivityCardContent(
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            // .fillMaxSize()
             .fillMaxWidth()
-            .fillMaxHeight(0.85f)
+            .fillMaxHeight(fraction = 0.85f)
             .background(color = Color(activity.color))
     ) { ->
 
@@ -205,14 +217,19 @@ private fun ActivityCardContent(
         Column { ->
             LargeButton(
                 text = "Clock In",
-                enabled = clockedInActivity == null,
-                onClick = { clockIn(activity) }
+                enabled = clockedInActivityId == null && !activity.isClockedIn,
+                onClick = {
+                    clockIn(activity)
+
+                }
             )
             Spacer(modifier = Modifier.padding(6.dp))
             LargeButton(
                 text = "Clock Out",
-                enabled = activity.id == clockedInActivity,
-                onClick = { clockOut(activity) }
+                enabled = clockedInActivityId == activity.id || activity.isClockedIn,
+                onClick = {
+                    clockOut(activity)
+                }
             )
 
         }

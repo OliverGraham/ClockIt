@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
 import com.olivergraham.clockit.feature_activity.common.Dates
+import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
