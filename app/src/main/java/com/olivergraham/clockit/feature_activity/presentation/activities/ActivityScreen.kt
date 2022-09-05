@@ -1,13 +1,14 @@
 package com.olivergraham.clockit.feature_activity.presentation.activities
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.olivergraham.clockit.feature_activity.presentation.activities.components.ActivitiesViewPager
+import com.olivergraham.clockit.feature_activity.presentation.activities.components.BarChartView
 import com.olivergraham.clockit.feature_activity.presentation.activities.components.TopAppBar
 import com.olivergraham.clockit.feature_activity.presentation.common_components.Fab
 import com.olivergraham.clockit.feature_activity.presentation.utility.Screen
@@ -45,7 +46,6 @@ fun ActivityScreen(
         floatingActionButtonPosition = FabPosition.Center,
         topBar = { TopAppBar() }
     ) { padding ->
-
         Column(modifier = Modifier.fillMaxSize()) { ->
             ActivitiesViewPager(
                 padding = padding,

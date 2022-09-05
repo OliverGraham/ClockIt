@@ -56,6 +56,13 @@ fun ActivityCardContent(
             textAlign = TextAlign.Center
         )
 
+        // TODO: Figure this out
+        Box(
+            modifier = Modifier.height(200.dp).width(200.dp)
+        ) {
+            BarChartView()
+        }
+
         Column { ->
             LargeButton(
                 text = "Clock In",
@@ -69,12 +76,6 @@ fun ActivityCardContent(
                 onClick = { clockOut(activity) }
             )
 
-        }
-        Column { ->
-            LargeButton(text = "Delete", onClick = {
-                /* TODO: delete and show an undo in SnackBar */
-            }
-            )
         }
 
     }
