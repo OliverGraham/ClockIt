@@ -18,6 +18,10 @@ data class Activity(
         val activityColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
     }
 
+    // TODO: need time spent per day, to show as the Y axis in the chart
+    //       need to save each day in a list...
+
+
     fun mostRecentClockInAsLabel() = Dates.dateStringToLabel(mostRecentClockIn)
     fun timeSpentAsLabel() = Dates.convertSecondsToLabel(timeSpent)
 }

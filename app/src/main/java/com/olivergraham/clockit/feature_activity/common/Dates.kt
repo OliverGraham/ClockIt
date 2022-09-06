@@ -20,6 +20,11 @@ object Dates {
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
     )
 
+    // TODO: Need a day for the X axis of the chart
+    fun dateToDayString(dateTime: LocalDateTime): String = dateTime.format(
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+    )
+
     private fun stringToDate(dateString: String): LocalDateTime =
         LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
 

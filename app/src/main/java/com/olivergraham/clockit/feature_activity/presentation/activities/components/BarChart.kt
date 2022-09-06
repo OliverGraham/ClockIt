@@ -8,6 +8,8 @@ import androidx.compose.ui.graphics.toArgb
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import me.bytebeats.views.charts.bar.BarChart
 import me.bytebeats.views.charts.bar.BarChartData
+import me.bytebeats.views.charts.bar.render.label.SimpleLabelDrawer
+import me.bytebeats.views.charts.bar.render.xaxis.IXAxisDrawer
 
 @Composable
 fun BarChartView(/*activities: List<Activity>*/) {
@@ -15,11 +17,11 @@ fun BarChartView(/*activities: List<Activity>*/) {
         BarChartData.Bar(
             label = "bar 1",
             value = 2f,
-            color = Color.Blue
+            color = Color.Magenta
         ),
         BarChartData.Bar(
             label = "bar 2",
-            value = 10f,
+            value = 2f,
             color = Color.Green
         )
 
@@ -28,10 +30,15 @@ fun BarChartView(/*activities: List<Activity>*/) {
         barChartData = BarChartData(
             bars = barList
         ),
+
         /*barChartData = BarChartData(
             bars = activityBars(activities)
         )*/
-        modifier = Modifier/*.fillMaxSize()*/
+        modifier = Modifier/*.fillMaxSize()*/,
+        labelDrawer = SimpleLabelDrawer(
+            drawLocation = SimpleLabelDrawer.DrawLocation.XAxis
+        )
+
     )
 }
 
