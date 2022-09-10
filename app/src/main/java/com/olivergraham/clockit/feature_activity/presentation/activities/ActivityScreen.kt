@@ -33,7 +33,11 @@ fun ActivityScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    ObserveUiEvents(activityViewModel.eventFlow, snackBarHostState)
+    ObserveUiEvents(
+        eventFlow = activityViewModel.eventFlow,
+        snackBarState = snackBarHostState,
+        restoreActivity = { activityViewModel.onEvent(ActivityEvent.RestoreActivity) }
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) } ,
@@ -59,6 +63,9 @@ fun ActivityScreen(
                 },
                 navigateWithActivity = { activity ->
                     navController.navigateWithActivity(activity = activity)
+                },
+                deleteActivity = { activity ->
+                    activityViewModel.onEvent(ActivityEvent.DeleteActivity(activity = activity))
                 }
             )
         }
@@ -68,22 +75,26 @@ fun ActivityScreen(
 @Composable
 private fun ObserveUiEvents(
     eventFlow: SharedFlow<ActivityViewModel.UiEvent>,
-    snackBarState: SnackbarHostState
+    snackBarState: SnackbarHostState,
+    restoreActivity: (ActivityEvent.RestoreActivity) -> Unit
 ) {
     LaunchedEffect(key1 = true) { ->
         eventFlow.collectLatest { event ->
             when (event) {
-                is ActivityViewModel.UiEvent.ClockIn -> {   // TODO: clean
-                   /* snackBarState.showSnackbar(
-                        message = event.message
-                    )*/
-                }
                 is ActivityViewModel.UiEvent.ShowSnackbar -> {
                     snackBarState.showSnackbar(
                         message = event.message
                     )
                 }
-                else -> {}
+                is ActivityViewModel.UiEvent.ShowSnackbarWithAction -> {
+                    val result = snackBarState.showSnackbar(
+                        message = event.message,
+                        actionLabel = "Undo"
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        restoreActivity(ActivityEvent.RestoreActivity)
+                    }
+                }
             }
         }
     }

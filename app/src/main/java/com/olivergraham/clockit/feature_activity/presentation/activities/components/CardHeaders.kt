@@ -20,7 +20,7 @@ import com.olivergraham.clockit.feature_activity.domain.model.Activity
 @Composable
 fun LongTextCardHeader(
     activity: Activity,
-    onDelete: (activity: Activity) -> Unit,
+    deleteActivity: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
 ) {
     val expanded = remember { mutableStateOf(value = false) }
@@ -34,7 +34,7 @@ fun LongTextCardHeader(
     ) { ->
         Text(
             //modifier = Modifier.align(Alignment.Center),
-            modifier = Modifier.weight(3f),
+            modifier = Modifier.weight(weight = 3f),
             text = activity.name,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.headlineSmall,
@@ -42,7 +42,7 @@ fun LongTextCardHeader(
         )
         //Spacer(Modifier.weight(1f))
         IconButton(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(weight = 1f),
             //modifier = Modifier.align(Alignment.CenterEnd).padding(8.dp),
             onClick = { expanded.value = true }
         ) {
@@ -61,7 +61,9 @@ fun LongTextCardHeader(
                     )
                     DropdownMenuItem(
                         text = { Text(text = "Delete Activity") },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            deleteActivity(activity)
+                        }
                     )
                 }
             }
@@ -72,7 +74,7 @@ fun LongTextCardHeader(
 @Composable
 fun CardHeader(
     activity: Activity,
-    onDelete: (activity: Activity) -> Unit,
+    deleteActivity: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
 ) {
     val expanded = remember { mutableStateOf(value = false) }
@@ -110,7 +112,9 @@ fun CardHeader(
                     )
                     DropdownMenuItem(
                         text = { Text(text = "Delete Activity") },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            deleteActivity(activity)
+                        }
                     )
                 }
             }

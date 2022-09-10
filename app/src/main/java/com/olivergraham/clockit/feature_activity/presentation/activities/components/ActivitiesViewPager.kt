@@ -27,7 +27,8 @@ fun ActivitiesViewPager(
     clockedInActivityId: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
-    navigateWithActivity: (activity: Activity) -> Unit
+    navigateWithActivity: (activity: Activity) -> Unit,
+    deleteActivity: (activity: Activity) -> Unit
 ) {
     // PaddingValues(end = 64.dp)) will show the next page's number
     HorizontalPager(
@@ -59,7 +60,8 @@ fun ActivitiesViewPager(
                 clockedInActivityId = clockedInActivityId,
                 clockIn = clockIn,
                 clockOut = clockOut,
-                navigateWithActivity = navigateWithActivity
+                navigateWithActivity = navigateWithActivity,
+                deleteActivity = deleteActivity
             )
         }
     }

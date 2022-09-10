@@ -19,19 +19,20 @@ fun ActivityCardContent(
     clockedInActivityId: Int?,
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
-    navigateWithActivity: (activity: Activity) -> Unit
+    navigateWithActivity: (activity: Activity) -> Unit,
+    deleteActivity: (activity: Activity) -> Unit
 ) {
 
     if (activity.name.length < 15) {
         CardHeader(
             activity = activity,
-            onDelete = {},
+            deleteActivity = deleteActivity,
             navigateWithActivity = navigateWithActivity
         )
     } else {
         LongTextCardHeader(
             activity = activity,
-            onDelete = {},
+            deleteActivity = deleteActivity,
             navigateWithActivity = navigateWithActivity
         )
     }
