@@ -17,8 +17,31 @@ import androidx.compose.ui.unit.dp
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 
 
+// TODO: Refactor this file
+
 @Composable
-fun LongTextCardHeader(
+fun CardHeader(
+    activity: Activity,
+    deleteActivity: (activity: Activity) -> Unit,
+    navigateWithActivity: (activity: Activity) -> Unit
+) {
+    if (activity.name.length < 15) {
+        ShortTextCardHeader(
+            activity = activity,
+            deleteActivity = deleteActivity,
+            navigateWithActivity = navigateWithActivity
+        )
+    } else {
+        LongTextCardHeader(
+            activity = activity,
+            deleteActivity = deleteActivity,
+            navigateWithActivity = navigateWithActivity
+        )
+    }
+}
+
+@Composable
+private fun LongTextCardHeader(
     activity: Activity,
     deleteActivity: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
@@ -72,7 +95,7 @@ fun LongTextCardHeader(
 }
 
 @Composable
-fun CardHeader(
+private fun ShortTextCardHeader(
     activity: Activity,
     deleteActivity: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit

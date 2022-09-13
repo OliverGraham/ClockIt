@@ -15,12 +15,12 @@ import me.bytebeats.views.charts.bar.render.xaxis.IXAxisDrawer
 fun BarChartView(/*activities: List<Activity>*/) {
     val barList = listOf(
         BarChartData.Bar(
-            label = "bar 1",
+            label = "Yesterday",
             value = 2f,
             color = Color.Magenta
         ),
         BarChartData.Bar(
-            label = "bar 2",
+            label = "Today",
             value = 2f,
             color = Color.Green
         )

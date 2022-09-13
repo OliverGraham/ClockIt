@@ -22,20 +22,11 @@ fun ActivityCardContent(
     navigateWithActivity: (activity: Activity) -> Unit,
     deleteActivity: (activity: Activity) -> Unit
 ) {
-
-    if (activity.name.length < 15) {
-        CardHeader(
-            activity = activity,
-            deleteActivity = deleteActivity,
-            navigateWithActivity = navigateWithActivity
-        )
-    } else {
-        LongTextCardHeader(
-            activity = activity,
-            deleteActivity = deleteActivity,
-            navigateWithActivity = navigateWithActivity
-        )
-    }
+    CardHeader(
+        activity = activity,
+        deleteActivity = deleteActivity,
+        navigateWithActivity = navigateWithActivity
+    )
 
     Column(
         verticalArrangement = Arrangement.SpaceAround,
@@ -58,9 +49,14 @@ fun ActivityCardContent(
         )
 
         // TODO: Figure this out
-        Box(
-            modifier = Modifier.height(200.dp).width(200.dp)
-        ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(200.dp)
+                .width(200.dp)
+        ) { ->
+            Text(text = "Hrs")
+            Spacer(modifier = Modifier.padding(16.dp))
             BarChartView()
         }
 

@@ -12,6 +12,7 @@ data class Activity(
     val isClockedIn: Boolean = false,
     val mostRecentClockIn: String = "",
     val timeSpent: Long = 0L,
+    // val timeSpentPerDay: List<Long> = emptyList(),
     val id: Int? = null
 ) {
     companion object {
@@ -24,6 +25,7 @@ data class Activity(
 
     fun mostRecentClockInAsLabel() = Dates.dateStringToLabel(mostRecentClockIn)
     fun timeSpentAsLabel() = Dates.convertSecondsToLabel(timeSpent)
+    // fun timeSpentPerDayAsLabel() = timeSpentPerDay.map { Dates.convertSecondsToLabel(it) }
 }
 
 class InvalidActivityException(message: String): Exception(message)

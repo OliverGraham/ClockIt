@@ -10,5 +10,6 @@ data class ActivityEntity(
     val isClockedIn: Boolean,
     val mostRecentClockIn: String,
     val timeSpent: Long,
+    // val timeSpentPerDay: List<Long>,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
 )
