@@ -9,7 +9,7 @@ fun ActivityEntity.toActivity(): Activity {
         isClockedIn = isClockedIn,
         mostRecentClockIn = mostRecentClockIn,
         timeSpent = timeSpent,
-        // timeSpentPerDay = timeSpentPerDay,
+        dailyTimes = dailyTimes,
         id = id
     )
 }
@@ -21,7 +21,7 @@ fun Activity.toActivityEntity(): ActivityEntity {
         isClockedIn = isClockedIn,
         mostRecentClockIn = mostRecentClockIn,
         timeSpent = timeSpent,
-        // timeSpentPerDay = timeSpentPerDay,
+        dailyTimes = dailyTimes,
         id = id
     )
 }

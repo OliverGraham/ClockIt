@@ -11,8 +11,8 @@ data class Activity(
     val color: Int = 0,
     val isClockedIn: Boolean = false,
     val mostRecentClockIn: String = "",
-    val timeSpent: Long = 0L,
-    // val timeSpentPerDay: List<Long> = emptyList(),
+    val timeSpent: Long = 0L,           // TODO: change to totalTimeSpent
+    val dailyTimes: List<DailyTime> = mutableListOf(),
     val id: Int? = null
 ) {
     companion object {
