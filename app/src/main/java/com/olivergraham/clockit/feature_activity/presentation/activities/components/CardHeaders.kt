@@ -137,6 +137,7 @@ private fun ShortTextCardHeader(
                         text = { Text(text = "Delete Activity") },
                         onClick = {
                             deleteActivity(activity)
+                            expanded.value = false
                         }
                     )
                 }

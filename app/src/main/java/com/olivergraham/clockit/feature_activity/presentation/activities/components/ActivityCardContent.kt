@@ -37,13 +37,15 @@ fun ActivityCardContent(
             .background(color = Color(activity.color))
     ) { ->
         Text(
-            text = "Last clock in:\n${activity.mostRecentClockInAsLabel()}",
+            // text = "Last clock in:\n${activity.mostRecentClockInAsLabel()}",
+            text = activity.lastClockInLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
 
         Text(
-            text = "Total time spent:\n${activity.timeSpentAsLabel()}",
+            //text = "Total time spent:\n${activity.timeSpentAsLabel()}",
+            text = activity.timeSpentLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )

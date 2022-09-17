@@ -9,8 +9,8 @@ data class ActivityEntity(
     val name: String,
     val color: Int,
     val isClockedIn: Boolean,
-    val mostRecentClockIn: String,
+    val lastClockIn: String,
     val timeSpent: Long,
-    val dailyTimes: List<DailyTime>,
+    val dailyTimes: MutableList<DailyTime>,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
 )

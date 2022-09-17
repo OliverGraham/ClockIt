@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olivergraham.clockit.feature_activity.common.Dates
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,18 +73,12 @@ class ActivityViewModel @Inject constructor(
 
     private fun performClockIn(event: ActivityEvent.ClockIn) {
         viewModelScope.launch { ->
-
-            val date = Dates.getCurrentTime()
-            val activity = event.activity.copy(
-                mostRecentClockIn = date.toString(),
-                isClockedIn = true
-            )
-
+            val activity = event.activity.clockIn()
             _eventFlow.emit(
                 UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
             )
             _state.value = state.value.copy(
-                clockedInActivityId = event.activity.id
+                clockedInActivityId = activity.id
             )
             activityUseCases.updateActivity(activity)
         }
@@ -94,15 +87,10 @@ class ActivityViewModel @Inject constructor(
     private fun performClockOut(event: ActivityEvent.ClockOut) {
         viewModelScope.launch { ->
 
-            val activity = event.activity.copy(
-                timeSpent = Dates.calculateTimeSpent(
-                    event.activity.mostRecentClockIn, event.activity.timeSpent
-                ),
-                isClockedIn = false
-            )
+            val activity = event.activity.clockOut()
             val sessionTime = activity.timeSpent - event.activity.timeSpent
             val clockedOutMessage = "Clocked out: ${activity.name}."
-            val timeAddedMessage = "Added ${Dates.convertSecondsToLabel(sessionTime)} to total!"
+            val timeAddedMessage = "Added ${Activity.convertSecondsToLabel(sessionTime)} to total!"
 
             _eventFlow.emit(UiEvent.ShowSnackbar(
                 message = "$clockedOutMessage $timeAddedMessage")
