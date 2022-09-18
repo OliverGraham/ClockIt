@@ -11,6 +11,6 @@ data class ActivityEntity(
     val isClockedIn: Boolean,
     val lastClockIn: String,
     val timeSpent: Long,
-    val dailyTimes: MutableList<DailyTime>,
+    val dailyTimes: List<DailyTimeEntity>,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
 )

@@ -17,6 +17,10 @@ data class Activity(
     val id: Int? = null
 ) {
 
+    override fun toString(): String {
+        return name
+    }
+
     companion object {
         val activityColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
 
@@ -80,25 +84,47 @@ data class Activity(
         return "Last clock in:\n${lastClockIn.toLabel()}"
     }
 
-
     fun getCurrentDate(): LocalDateTime = LocalDateTime.now()
 
     /** Copies and returns given activity, after adjusting some clock in fields */
     fun clockIn(): Activity {
-        // appendDailyTime()
-        // dailyTimes.add(DailyTime(date =))
+
+        val dateTime = LocalDateTime.now()
+        if (dailyTimes.isEmpty() || dailyTimeDifferentDate(dateTime)) {
+            dailyTimes.add(DailyTime(date = dateTime))
+        }
+
         return copy(
-            lastClockIn =  LocalDateTime.now(),
+            lastClockIn = dateTime,
             isClockedIn = true
         )
     }
 
+    private fun dailyTimeDifferentDate(dateTime: LocalDateTime): Boolean =
+        dailyTimes.last().date?.toLocalDate() != dateTime.toLocalDate()
+
+    private fun setDailyTimeSpent(time: Long) {
+        dailyTimes[dailyTimes.lastIndex] = dailyTimes.last().copy(timeSpent = time)
+    }
+
     // TODO: Save date of last clock out??
     /** Copies and returns given activity, after adjusting some clock out fields */
-    fun clockOut(): Activity = copy(
-        timeSpent = calculateTimeSpent(),
-        isClockedIn = false
-    )
+    fun clockOut(): Activity {
+
+        val dateTime = LocalDateTime.now()
+        if (dailyTimeDifferentDate(dateTime)) {
+            // clocking out from one day to another;
+            // need to separate by day for the bar chart
+        }
+
+        val time = calculateTimeSpent()
+        setDailyTimeSpent(time = time)
+
+        return copy(
+            timeSpent = time,
+            isClockedIn = false
+        )
+    }
 
     private fun calculateTimeSpent(): Long =
         Duration.between(lastClockIn, LocalDateTime.now()).seconds + timeSpent
@@ -112,34 +138,6 @@ data class Activity(
         }
         return "Total time spent:\n${convertSecondsToLabel(timeSpent)}"
     }
-
-
-    /**  -----------DailyTime-----------  **/
-
-    /*fun appendDailyTime() {
-        if (dailyTimes.isEmpty()) {
-            dailyTimes.add(DailyTime(date = mostRecentClockInAsLabel()))
-            return
-        }
-    }
-
-    fun addToDailyTime(time: Long) {
-
-        if (dailyTimes.isEmpty()) {
-            dailyTimes.add(DailyTime(time, mostRecentClockInAsLabel()))
-            return
-        }
-        val current = dailyTimes[dailyTimes.lastIndex]
-
-        if (dailyTimes[dailyTimes.lastIndex].date == mostRecentClockIn) {
-            dailyTimes[dailyTimes.lastIndex] = current.copy(
-                timeSpent = current.timeSpent + time
-            )
-        } else {
-            // if here, that means need to create a new one?
-            dailyTimes.add(DailyTime(time, mostRecentClockInAsLabel()))
-        }
-    }*/
 }
 
 class InvalidActivityException(message: String): Exception(message)
