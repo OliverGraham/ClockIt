@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class DailyTime(
     val timeSpent: Long = 0L,
-    // val date: String
     val date: LocalDateTime?
-)
+) {
+    fun LocalDateTime.asDateOnly() = date?.toLocalDate()
+}
