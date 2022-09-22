@@ -6,5 +6,6 @@ data class ActivityState(
     val activities: List<Activity> = emptyList(),
     // val activityOrder: ActivityOrder = ActivityOrder.Date(OrderType.Descending),
     val isOrderSectionVisible: Boolean = false,
-    val clockedInActivityId: Int? = null
+    val clockedInActivityId: Int? = null,
+    val maxBarValue: Float = 0F
 )

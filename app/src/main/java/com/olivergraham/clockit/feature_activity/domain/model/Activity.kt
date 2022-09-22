@@ -1,5 +1,6 @@
 package com.olivergraham.clockit.feature_activity.domain.model
 
+import androidx.compose.ui.graphics.toArgb
 import com.olivergraham.clockit.ui.theme.*
 import java.time.Duration
 import java.time.LocalDateTime
@@ -21,8 +22,33 @@ data class Activity(
         return name
     }
 
+    /** Get a color that is distinct from the activity's main color */
+    fun getRandomNonBackgroundColor(vararg takenColor: Int): Int {
+        var randomColor = getRandomColor()
+        while (randomColor == color || randomColor in takenColor) {
+            randomColor = getRandomColor()
+        }
+        return randomColor
+    }
+
     companion object {
+
+        /** */
+        fun List<Activity>.getHighestDailyTimeSpentForMaxBar(): Float {
+            var highest = 0L
+            this.forEach { activity ->
+                activity.dailyTimes.forEach { dailyTime ->
+                    val current = dailyTime.timeSpent
+                    if (current > highest) {
+                        highest = current
+                    }
+                }
+            }
+            return highest.toFloat()
+        }
+
         val activityColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
+        fun getRandomColor(): Int = activityColors.random().toArgb()
 
         // Label in this format:    Sep 16, 2022, 8:16:10 PM
         private fun LocalDateTime.toLabel(): String = this.format(
@@ -30,6 +56,7 @@ data class Activity(
         )
 
         private const val secondsInDay = 86400L
+        private const val SECONDS_IN_DAY = 86400L
         private const val secondsInHour = 3600L
         private const val secondsInMinute = 60L
 
@@ -121,18 +148,38 @@ data class Activity(
         if (dailyTimeDifferentDate(dateTime)) {
             determineTimeOverMultipleDays()
         } else {
-            setDailyTimeSpent(time = timeSpent)
+            setDailyTimeSpent(time = calculateDailyTimeSpent(dateTime))
         }
-
+        // addTimeToYesterday()
         return copy(
             timeSpent = timeSpent,
             isClockedIn = false
         )
     }
 
+    /** Use to test! Currently, only works with one call */
+    private fun addTimeToYesterday() {
+
+        val yesterday = LocalDateTime.now().minusDays(1)
+        if (yesterday.toLocalDate() == dailyTimes.last().date?.toLocalDate()) return
+
+        addDailyTime(dateTime = yesterday)
+        setDailyTimeSpent(time = 45L)
+        val first = dailyTimes[0]
+        val second = dailyTimes[1]
+        dailyTimes[0] = second
+        dailyTimes[1] = first
+    }
+
     /** Calculate seconds between lastClockIn and given time, and add to running total */
     private fun calculateTimeSpent(dateTime: LocalDateTime): Long =
         Duration.between(lastClockIn, dateTime).seconds + timeSpent
+
+    /** Calculate seconds between lastClockIn and given time,
+     *  and add to running total for current day
+     * */
+    private fun calculateDailyTimeSpent(dateTime: LocalDateTime): Long =
+        Duration.between(lastClockIn, dateTime).seconds + dailyTimes.last().timeSpent
 
     /** Given a date, add a new DailyTime to the end of the list */
     private fun addDailyTime(dateTime: LocalDateTime) {

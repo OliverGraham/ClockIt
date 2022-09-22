@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
+import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
 import com.olivergraham.clockit.feature_activity.presentation.common_components.LargeButton
 
 @Composable
@@ -20,7 +21,8 @@ fun ActivityCardContent(
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit,
-    deleteActivity: (activity: Activity) -> Unit
+    deleteActivity: (activity: Activity) -> Unit,
+    maxBarValue: Float
 ) {
     CardHeader(
         activity = activity,
@@ -37,14 +39,12 @@ fun ActivityCardContent(
             .background(color = Color(activity.color))
     ) { ->
         Text(
-            // text = "Last clock in:\n${activity.mostRecentClockInAsLabel()}",
             text = activity.lastClockInLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
 
         Text(
-            //text = "Total time spent:\n${activity.timeSpentAsLabel()}",
             text = activity.timeSpentLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
@@ -57,9 +57,12 @@ fun ActivityCardContent(
                 .height(200.dp)
                 .width(200.dp)
         ) { ->
-            Text(text = "Hrs")
+            Text(text = "Hrs") // TODO: Figure this out
             Spacer(modifier = Modifier.padding(16.dp))
-            BarChartView()
+            BarChartSummary(
+                activity = activity,
+                maxBarValue = maxBarValue
+            )
         }
 
         Column { ->
@@ -74,8 +77,6 @@ fun ActivityCardContent(
                 enabled = clockedInActivityId == activity.id || activity.isClockedIn,
                 onClick = { clockOut(activity) }
             )
-
         }
-
     }
 }

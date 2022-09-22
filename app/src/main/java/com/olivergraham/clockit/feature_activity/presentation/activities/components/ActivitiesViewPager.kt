@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -14,6 +17,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
+import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
 import kotlin.math.absoluteValue
 
 /**
@@ -28,7 +32,8 @@ fun ActivitiesViewPager(
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit,
-    deleteActivity: (activity: Activity) -> Unit
+    deleteActivity: (activity: Activity) -> Unit,
+    maxBarValue: Float
 ) {
     // PaddingValues(end = 64.dp)) will show the next page's number
     HorizontalPager(
@@ -61,7 +66,8 @@ fun ActivitiesViewPager(
                 clockIn = clockIn,
                 clockOut = clockOut,
                 navigateWithActivity = navigateWithActivity,
-                deleteActivity = deleteActivity
+                deleteActivity = deleteActivity,
+                maxBarValue = maxBarValue
             )
         }
     }

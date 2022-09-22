@@ -29,9 +29,9 @@ fun ActivityScreen(
     val activities = state.activities
 
     // determine if an activity is already clocked in
-    val clockedInActivity by remember(activities) {
+    /*val clockedInActivity by remember(activities) {
         derivedStateOf { activities.firstOrNull { activity -> activity.isClockedIn } }
-    }
+    }*/
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -61,7 +61,7 @@ fun ActivityScreen(
                 ActivitiesViewPager(
                     padding = padding,
                     activities = activities,
-                    clockedInActivityId = clockedInActivity?.id,
+                    clockedInActivityId = state.clockedInActivityId,
                     clockIn = { activity ->
                         activityViewModel.onEvent(ActivityEvent.ClockIn(activity = activity))
                     },
@@ -73,7 +73,8 @@ fun ActivityScreen(
                     },
                     deleteActivity = { activity ->
                         activityViewModel.onEvent(ActivityEvent.DeleteActivity(activity = activity))
-                    }
+                    },
+                    maxBarValue = state.maxBarValue
                 )
             }
         }
