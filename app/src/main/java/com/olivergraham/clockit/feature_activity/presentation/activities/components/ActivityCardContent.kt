@@ -49,7 +49,7 @@ fun ActivityCardContent(
         )
 
         BarChartSummary(activity = activity)
-
+        Spacer(modifier = Modifier.padding(vertical = 6.dp))
         Column { ->
             LargeButton(
                 text = "Clock In",
