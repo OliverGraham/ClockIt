@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,20 +43,15 @@ class ActivityViewModel @Inject constructor(
             .onEach { activities ->
                 _state.value = state.value.copy(
                     activities = activities,
-                    clockedInActivityId = activities.firstOrNull {
-                            activity -> activity.isClockedIn
-                    }?.id,
+                    clockedInActivityId = getClockedInActivityId(activities),
                 )
             }
             .launchIn(viewModelScope)
     }
 
-    /*private fun populateBarChartStateMap(activities: List<Activity>): MutableMap<Int?, BarChartState> =
-        activities.associate { activity ->
-            activity.id to getMaxBarForState(activity)
-        }.toMutableMap()*/
-
-
+    /** Return the id of the clocked-in activity, if an activity is clocked in */
+    private fun getClockedInActivityId(activities: List<Activity>): Int? =
+        activities.firstOrNull { activity -> activity.isClockedIn }?.id
 
     /** */
     fun onEvent(event: ActivityEvent) {
@@ -89,8 +85,6 @@ class ActivityViewModel @Inject constructor(
             _eventFlow.emit(
                value = UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
             )
-
-            // _state.value.clockedInActivityId = activity.id
             _state.value = state.value.copy(
                 clockedInActivityId = activity.id
             )
@@ -105,7 +99,7 @@ class ActivityViewModel @Inject constructor(
             val activity = event.activity.clockOut()
             val sessionTime = activity.timeSpent - event.activity.timeSpent
             val clockedOutMessage = "Clocked out: ${activity.name}."
-            val timeAddedMessage = "Added ${Activity.convertSecondsToLabel(sessionTime)} to total!"
+            val timeAddedMessage = "Added ${TimeLabels.convertSecondsToLabel(sessionTime)} to total!"
 
             _eventFlow.emit(
                 UiEvent.ShowSnackbar(message = "$clockedOutMessage $timeAddedMessage")

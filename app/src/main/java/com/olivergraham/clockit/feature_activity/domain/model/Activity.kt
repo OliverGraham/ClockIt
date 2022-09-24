@@ -1,6 +1,7 @@
 package com.olivergraham.clockit.feature_activity.domain.model
 
 import androidx.compose.ui.graphics.toArgb
+import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
 import com.olivergraham.clockit.ui.theme.*
 import java.time.Duration
 import java.time.LocalDateTime
@@ -31,65 +32,7 @@ data class Activity(
         return randomColor
     }
 
-    private fun getMaxBar(): Pair<Float, Int> {
-        val size = dailyTimes.size - 1
-        val minHours = SECONDS_IN_HOUR * 6
-        var timeUnit = minHours
-        var timeUnitFlag = 2        // hours == 2, minutes == 1, seconds == 0
-        var highest = 0L
-
-        if (size < 1) {
-            return Pair(1000000F, 0)
-        }
-
-        // two most recent days
-        for (i in size.downTo(to = size - 1)) {
-
-            val currentTime = dailyTimes[i].timeSpent
-            if (currentTime > highest) {
-                highest = currentTime
-                if (highest <= SECONDS_IN_MINUTE) {
-                    timeUnit = highest
-                    timeUnitFlag = 0
-
-                } else if (highest <= SECONDS_IN_HOUR) {
-                    timeUnit = highest.toMinutes()
-                    timeUnitFlag = 1
-                } else if (highest <= minHours) {
-                    timeUnit = minHours.toHours()
-                    timeUnitFlag = 2
-                } else {
-                    timeUnit = highest.toHours()
-                    timeUnitFlag = 2
-                }
-            }
-        }
-
-        // default highest number of hours in bar chart summary
-        return Pair(timeUnit.toFloat(), timeUnitFlag)
-    }
-
-    fun getBarChartYAxisInfo(): Pair<Float, String> {
-        val (time, flag) = getMaxBar()
-        val label = if (flag == 0) "seconds" else if (flag == 1) "minutes" else "hours"
-        return Pair(time, label)
-    }
-
     companion object {
-
-        /** */
-        fun List<Activity>.getHighestDailyTimeSpentForMaxBar(): Float {
-            var highest = 0L
-            this.forEach { activity ->
-                activity.dailyTimes.forEach { dailyTime ->
-                    val current = dailyTime.timeSpent
-                    if (current > highest) {
-                        highest = current
-                    }
-                }
-            }
-            return highest.toFloat()
-        }
 
         val activityColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
         fun getRandomColor(): Int = activityColors.random().toArgb()
@@ -98,54 +41,6 @@ data class Activity(
         private fun LocalDateTime.toLabel(): String = this.format(
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
         )
-
-        private const val SECONDS_IN_DAY = 86400L
-        private const val SECONDS_IN_HOUR = 3600L
-        private const val SECONDS_IN_MINUTE = 60L
-
-        private fun Long.toDays(): Long = this / SECONDS_IN_DAY
-        private fun Long.toHours(): Long = this / SECONDS_IN_HOUR
-        private fun Long.toMinutes(): Long = this / SECONDS_IN_MINUTE
-
-        /** Convert the given number of seconds into a relevant message */
-        fun convertSecondsToLabel(totalSeconds: Long): String {
-
-            val days = totalSeconds.toDays()
-            val hours = totalSeconds.toHours() - days * 24
-            val minutes = totalSeconds.toMinutes() - totalSeconds.toHours() * 60
-            val seconds = totalSeconds - totalSeconds.toMinutes() * 60
-
-            return buildString { ->
-                if (days > 0L) {
-                    if (days == 1L) {
-                        append("$days day, ")
-                    } else {
-                        append("$days days, ")
-                    }
-                }
-                if (hours > 0L) {
-                    if (hours == 1L) {
-                        append("$hours hour, ")
-                    } else {
-                        append("$hours hours, ")
-                    }
-                }
-                if (minutes > 0L) {
-                    if (minutes == 1L) {
-                        append("$minutes minute, ")
-                    } else {
-                        append("$minutes minutes, ")
-                    }
-                }
-                if (seconds > 0L) {
-                    if (seconds == 1L) {
-                        append("$seconds second")
-                    } else {
-                        append("$seconds seconds")
-                    }
-                }
-            }
-        }
     }
 
     /** Return a message representing the total time spent in this activity */
@@ -156,7 +51,7 @@ data class Activity(
         if (timeSpent == 0L) {
             return "Tracking time..."
         }
-        return "Total time spent:\n${convertSecondsToLabel(timeSpent)}"
+        return "Total time spent:\n${TimeLabels.convertSecondsToLabel(timeSpent)}"
     }
 
     /** Return a message abut the status of the last clock-in  */
@@ -249,10 +144,10 @@ data class Activity(
 
         // Now, add new days
         var remainderSeconds = totalSeconds - lastClockInToMidnightThatDay
-        val totalDays = remainderSeconds / SECONDS_IN_DAY
+        val totalDays = remainderSeconds / TimeLabels.SECONDS_IN_DAY
 
         addDays(totalDays)
-        remainderSeconds -= SECONDS_IN_DAY * totalDays
+        remainderSeconds -= TimeLabels.SECONDS_IN_DAY * totalDays
         addFinalDay(remainderSeconds)
     }
 
@@ -268,7 +163,7 @@ data class Activity(
         if (lastClockIn != null) {
             for (day in 1..totalDays) {
                 addDailyTime(lastClockIn.plusDays(day))
-                setDailyTimeSpent(SECONDS_IN_DAY)
+                setDailyTimeSpent(TimeLabels.SECONDS_IN_DAY)
             }
         }
     }

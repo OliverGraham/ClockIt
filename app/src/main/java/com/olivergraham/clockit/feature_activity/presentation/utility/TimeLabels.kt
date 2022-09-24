@@ -3,7 +3,7 @@ package com.olivergraham.clockit.feature_activity.presentation.utility
 import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
 
 object TimeLabels {
-    private const val SECONDS_IN_DAY = 86400L
+    const val SECONDS_IN_DAY = 86400L
     private const val SECONDS_IN_HOUR = 3600L
     private const val SECONDS_IN_MINUTE = 60L
 
