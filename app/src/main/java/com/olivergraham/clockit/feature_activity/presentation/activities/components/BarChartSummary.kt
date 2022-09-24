@@ -1,6 +1,7 @@
 package com.olivergraham.clockit.feature_activity.presentation.activities.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -12,10 +13,13 @@ import androidx.compose.ui.unit.dp
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
 import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
+import com.olivergraham.clockit.ui.theme.getFontSize
 import me.bytebeats.views.charts.bar.BarChart
 import me.bytebeats.views.charts.bar.BarChartData
 import me.bytebeats.views.charts.bar.render.label.SimpleLabelDrawer
-
+import me.bytebeats.views.charts.bar.render.xaxis.IXAxisDrawer
+import me.bytebeats.views.charts.bar.render.xaxis.SimpleXAxisDrawer
+import me.bytebeats.views.charts.bar.render.yaxis.SimpleYAxisDrawer
 
 
 @Composable
@@ -59,8 +63,16 @@ private fun BarChartBody(activity: Activity, maxBarValue: Float, timeModifier: F
             maxBarValue = maxBarValue
         ),
         modifier = Modifier/*.fillMaxSize()*/,
+        xAxisDrawer = SimpleXAxisDrawer(
+            axisLineThickness = 2.dp
+        ),
+        yAxisDrawer = SimpleYAxisDrawer(
+            labelTextSize = MaterialTheme.typography.getFontSize() / 1.2,
+            axisLineThickness = 2.dp
+        ),
         labelDrawer = SimpleLabelDrawer(
-            drawLocation = SimpleLabelDrawer.DrawLocation.XAxis
+            drawLocation = SimpleLabelDrawer.DrawLocation.XAxis,
+            labelTextSize = MaterialTheme.typography.getFontSize() / 1.2
         )
     )
 }

@@ -47,9 +47,9 @@ fun ActivityCardContent(
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
-
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
         BarChartSummary(activity = activity)
-        Spacer(modifier = Modifier.padding(vertical = 6.dp))
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
         Column { ->
             LargeButton(
                 text = "Clock In",

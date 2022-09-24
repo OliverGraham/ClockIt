@@ -25,7 +25,7 @@ fun CardHeader(
     deleteActivity: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit
 ) {
-    if (activity.name.length < 15) {
+    if (activity.name.length < 13) {
         ShortTextCardHeader(
             activity = activity,
             deleteActivity = deleteActivity,
@@ -79,11 +79,18 @@ private fun LongTextCardHeader(
                     onDismissRequest = { expanded.value = false }
                 ) { ->
                     DropdownMenuItem(
-                        text = { Text(text = "Edit Activity") },
-                        onClick = { navigateWithActivity(activity) }
+                        text = { Text(
+                            text = "Edit Activity",
+                            style = MaterialTheme.typography.bodyMedium
+                        ) },
+                        onClick = { navigateWithActivity(activity) },
+
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Delete Activity") },
+                        text = { Text(
+                            text = "Delete Activity",
+                            style = MaterialTheme.typography.bodyMedium
+                        ) },
                         onClick = {
                             deleteActivity(activity)
                         }
@@ -130,11 +137,17 @@ private fun ShortTextCardHeader(
                     onDismissRequest = { expanded.value = false }
                 ) { ->
                     DropdownMenuItem(
-                        text = { Text(text = "Edit Activity") },
+                        text = { Text(
+                            text = "Edit Activity",
+                            style = MaterialTheme.typography.bodyMedium
+                        ) },
                         onClick = { navigateWithActivity(activity) }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Delete Activity") },
+                        text = { Text(
+                            text = "Delete Activity",
+                            style = MaterialTheme.typography.bodyMedium
+                        ) },
                         onClick = {
                             deleteActivity(activity)
                             expanded.value = false

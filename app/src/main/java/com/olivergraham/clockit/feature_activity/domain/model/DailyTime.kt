@@ -1,5 +1,6 @@
 package com.olivergraham.clockit.feature_activity.domain.model
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class DailyTime(
@@ -7,10 +8,11 @@ data class DailyTime(
     val date: LocalDateTime?
 ) {
 
-    /** Return the date's month/day as a string*/
+    /** Return the date's month/day as a string */
     fun monthDay(): String {
         val theDate = date?.toLocalDate()
-        return "${theDate?.monthValue}/${theDate?.dayOfMonth}"
+        val fullDate = "${theDate?.monthValue}/${theDate?.dayOfMonth}"
+        return if (theDate == LocalDate.now()) "Today" else fullDate
     }
 
     companion object {
