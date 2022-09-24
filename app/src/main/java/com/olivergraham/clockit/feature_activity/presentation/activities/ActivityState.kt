@@ -7,5 +7,14 @@ data class ActivityState(
     // val activityOrder: ActivityOrder = ActivityOrder.Date(OrderType.Descending),
     val isOrderSectionVisible: Boolean = false,
     val clockedInActivityId: Int? = null,
-    val maxBarValue: Float = 0F
+    // val clockedInActivityId: Int? = null, was val, checking performance...
+    // val maxBarValue: Float = 0F,
+    // var barChartSummaryMap: MutableMap<Int?, BarChartState> = mutableMapOf()
 )
+
+/*
+data class BarChartState(
+    val timeModifier: Float = 1F,
+    val maxBarValue: Float = 60F,
+    val timeUnitLabel: String = "Seconds"
+)*/

@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
-import com.olivergraham.clockit.feature_activity.domain.model.Activity.Companion.getHighestDailyTimeSpentForMaxBar
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -46,11 +45,17 @@ class ActivityViewModel @Inject constructor(
                     clockedInActivityId = activities.firstOrNull {
                             activity -> activity.isClockedIn
                     }?.id,
-                    maxBarValue = activities.getHighestDailyTimeSpentForMaxBar()
                 )
             }
             .launchIn(viewModelScope)
     }
+
+    /*private fun populateBarChartStateMap(activities: List<Activity>): MutableMap<Int?, BarChartState> =
+        activities.associate { activity ->
+            activity.id to getMaxBarForState(activity)
+        }.toMutableMap()*/
+
+
 
     /** */
     fun onEvent(event: ActivityEvent) {
@@ -82,8 +87,10 @@ class ActivityViewModel @Inject constructor(
         viewModelScope.launch { ->
             val activity = event.activity.clockIn()
             _eventFlow.emit(
-                UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
+               value = UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
             )
+
+            // _state.value.clockedInActivityId = activity.id
             _state.value = state.value.copy(
                 clockedInActivityId = activity.id
             )
@@ -100,24 +107,23 @@ class ActivityViewModel @Inject constructor(
             val clockedOutMessage = "Clocked out: ${activity.name}."
             val timeAddedMessage = "Added ${Activity.convertSecondsToLabel(sessionTime)} to total!"
 
-            _eventFlow.emit(UiEvent.ShowSnackbar(
-                message = "$clockedOutMessage $timeAddedMessage")
+            _eventFlow.emit(
+                UiEvent.ShowSnackbar(message = "$clockedOutMessage $timeAddedMessage")
             )
             _state.value = state.value.copy(
-                clockedInActivityId = null,
-                maxBarValue = getMaxBarValue(activity)
+                clockedInActivityId = null
             )
             activityUseCases.updateActivity(activity)
         }
     }
 
     /** Compares DailyTime's timeSpent to the current max bar value, and returns the greatest  */
-    private fun getMaxBarValue(activity: Activity): Float {
+    /*private fun getMaxBarValue(activity: Activity): Float {
         val dailyTimeSpent = activity.dailyTimes.last().timeSpent
         val stateMaxValue = _state.value.maxBarValue
         return (if (dailyTimeSpent > stateMaxValue) dailyTimeSpent else stateMaxValue).toFloat()
 
-    }
+    }*/
 
     /** */
     private fun performDeleteActivity(event: ActivityEvent.DeleteActivity) {

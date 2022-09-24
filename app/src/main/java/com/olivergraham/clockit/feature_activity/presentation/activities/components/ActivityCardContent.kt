@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
-import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
 import com.olivergraham.clockit.feature_activity.presentation.common_components.LargeButton
 
 @Composable
@@ -21,8 +20,7 @@ fun ActivityCardContent(
     clockIn: (activity: Activity) -> Unit,
     clockOut: (activity: Activity) -> Unit,
     navigateWithActivity: (activity: Activity) -> Unit,
-    deleteActivity: (activity: Activity) -> Unit,
-    maxBarValue: Float
+    deleteActivity: (activity: Activity) -> Unit
 ) {
     CardHeader(
         activity = activity,
@@ -50,20 +48,7 @@ fun ActivityCardContent(
             textAlign = TextAlign.Center
         )
 
-        // TODO: Figure this out
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(200.dp)
-                .width(200.dp)
-        ) { ->
-            Text(text = "Hrs") // TODO: Figure this out
-            Spacer(modifier = Modifier.padding(16.dp))
-            BarChartSummary(
-                activity = activity,
-                maxBarValue = maxBarValue
-            )
-        }
+        BarChartSummary(activity = activity)
 
         Column { ->
             LargeButton(

@@ -31,6 +31,50 @@ data class Activity(
         return randomColor
     }
 
+    private fun getMaxBar(): Pair<Float, Int> {
+        val size = dailyTimes.size - 1
+        val minHours = SECONDS_IN_HOUR * 6
+        var timeUnit = minHours
+        var timeUnitFlag = 2        // hours == 2, minutes == 1, seconds == 0
+        var highest = 0L
+
+        if (size < 1) {
+            return Pair(1000000F, 0)
+        }
+
+        // two most recent days
+        for (i in size.downTo(to = size - 1)) {
+
+            val currentTime = dailyTimes[i].timeSpent
+            if (currentTime > highest) {
+                highest = currentTime
+                if (highest <= SECONDS_IN_MINUTE) {
+                    timeUnit = highest
+                    timeUnitFlag = 0
+
+                } else if (highest <= SECONDS_IN_HOUR) {
+                    timeUnit = highest.toMinutes()
+                    timeUnitFlag = 1
+                } else if (highest <= minHours) {
+                    timeUnit = minHours.toHours()
+                    timeUnitFlag = 2
+                } else {
+                    timeUnit = highest.toHours()
+                    timeUnitFlag = 2
+                }
+            }
+        }
+
+        // default highest number of hours in bar chart summary
+        return Pair(timeUnit.toFloat(), timeUnitFlag)
+    }
+
+    fun getBarChartYAxisInfo(): Pair<Float, String> {
+        val (time, flag) = getMaxBar()
+        val label = if (flag == 0) "seconds" else if (flag == 1) "minutes" else "hours"
+        return Pair(time, label)
+    }
+
     companion object {
 
         /** */
@@ -55,14 +99,13 @@ data class Activity(
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
         )
 
-        private const val secondsInDay = 86400L
         private const val SECONDS_IN_DAY = 86400L
-        private const val secondsInHour = 3600L
-        private const val secondsInMinute = 60L
+        private const val SECONDS_IN_HOUR = 3600L
+        private const val SECONDS_IN_MINUTE = 60L
 
-        private fun Long.toDays(): Long = this / secondsInDay
-        private fun Long.toHours(): Long = this / secondsInHour
-        private fun Long.toMinutes(): Long = this / secondsInMinute
+        private fun Long.toDays(): Long = this / SECONDS_IN_DAY
+        private fun Long.toHours(): Long = this / SECONDS_IN_HOUR
+        private fun Long.toMinutes(): Long = this / SECONDS_IN_MINUTE
 
         /** Convert the given number of seconds into a relevant message */
         fun convertSecondsToLabel(totalSeconds: Long): String {
@@ -206,10 +249,10 @@ data class Activity(
 
         // Now, add new days
         var remainderSeconds = totalSeconds - lastClockInToMidnightThatDay
-        val totalDays = remainderSeconds / secondsInDay
+        val totalDays = remainderSeconds / SECONDS_IN_DAY
 
         addDays(totalDays)
-        remainderSeconds -= secondsInDay * totalDays
+        remainderSeconds -= SECONDS_IN_DAY * totalDays
         addFinalDay(remainderSeconds)
     }
 
@@ -225,7 +268,7 @@ data class Activity(
         if (lastClockIn != null) {
             for (day in 1..totalDays) {
                 addDailyTime(lastClockIn.plusDays(day))
-                setDailyTimeSpent(secondsInDay)
+                setDailyTimeSpent(SECONDS_IN_DAY)
             }
         }
     }
