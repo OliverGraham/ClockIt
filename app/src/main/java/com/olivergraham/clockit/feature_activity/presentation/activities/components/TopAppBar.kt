@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.sp
 fun TopAppBar() {
     CenterAlignedTopAppBar(
         title = { Text(
-            text = "Clock it",
+            text = "ClockIt",
             style = MaterialTheme.typography.titleLarge,
             fontSize = 36.sp
             )

@@ -62,7 +62,7 @@ fun ClockItTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = if (darkTheme) DarkTypography else LightTypography,
         content = content
     )
 }
