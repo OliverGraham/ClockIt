@@ -37,29 +37,19 @@ fun ActivityCardContent(
             .background(color = Color(activity.color))
     ) { ->
         Text(
-            text = "Last clock in:\n${activity.mostRecentClockInAsLabel()}",
+            text = activity.lastClockInLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
 
         Text(
-            text = "Total time spent:\n${activity.timeSpentAsLabel()}",
+            text = activity.timeSpentLabel(),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
-
-        // TODO: Figure this out
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(200.dp)
-                .width(200.dp)
-        ) { ->
-            Text(text = "Hrs")
-            Spacer(modifier = Modifier.padding(16.dp))
-            BarChartView()
-        }
-
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
+        BarChartSummary(activity = activity)
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
         Column { ->
             LargeButton(
                 text = "Clock In",
@@ -72,8 +62,6 @@ fun ActivityCardContent(
                 enabled = clockedInActivityId == activity.id || activity.isClockedIn,
                 onClick = { clockOut(activity) }
             )
-
         }
-
     }
 }

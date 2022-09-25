@@ -4,9 +4,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.olivergraham.clockit.feature_activity.common.Dates
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.use_case.ActivityUseCases
+import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,17 +36,24 @@ class ActivityViewModel @Inject constructor(
         getActivities()
     }
 
+    /** */
     private fun getActivities() {
         getActivityJob?.cancel()
         getActivityJob = activityUseCases.getActivities()
             .onEach { activities ->
                 _state.value = state.value.copy(
-                    activities = activities
+                    activities = activities,
+                    clockedInActivityId = getClockedInActivityId(activities),
                 )
             }
             .launchIn(viewModelScope)
     }
 
+    /** Return the id of the clocked-in activity, if an activity is clocked in */
+    private fun getClockedInActivityId(activities: List<Activity>): Int? =
+        activities.firstOrNull { activity -> activity.isClockedIn }?.id
+
+    /** */
     fun onEvent(event: ActivityEvent) {
         when (event) {
             is ActivityEvent.ClockIn -> {
@@ -67,45 +74,35 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
-
     /*private fun performNavigateToEditScreen(event: ActivityEvent.NavigateToEditScreen) {
         navController.navigateWithActivity(event.activity)
     }*/
 
+    /** */
     private fun performClockIn(event: ActivityEvent.ClockIn) {
         viewModelScope.launch { ->
-
-            val date = Dates.getCurrentTime()
-            val activity = event.activity.copy(
-                mostRecentClockIn = date.toString(),
-                isClockedIn = true
-            )
-
+            val activity = event.activity.clockIn()
             _eventFlow.emit(
-                UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
+               value = UiEvent.ShowSnackbar(message = "Clocking in: ${activity.name}")
             )
             _state.value = state.value.copy(
-                clockedInActivityId = event.activity.id
+                clockedInActivityId = activity.id
             )
             activityUseCases.updateActivity(activity)
         }
     }
 
+    /** */
     private fun performClockOut(event: ActivityEvent.ClockOut) {
         viewModelScope.launch { ->
 
-            val activity = event.activity.copy(
-                timeSpent = Dates.calculateTimeSpent(
-                    event.activity.mostRecentClockIn, event.activity.timeSpent
-                ),
-                isClockedIn = false
-            )
+            val activity = event.activity.clockOut()
             val sessionTime = activity.timeSpent - event.activity.timeSpent
             val clockedOutMessage = "Clocked out: ${activity.name}."
-            val timeAddedMessage = "Added ${Dates.convertSecondsToLabel(sessionTime)} to total!"
+            val timeAddedMessage = "Added ${TimeLabels.convertSecondsToLabel(sessionTime)} to total!"
 
-            _eventFlow.emit(UiEvent.ShowSnackbar(
-                message = "$clockedOutMessage $timeAddedMessage")
+            _eventFlow.emit(
+                UiEvent.ShowSnackbar(message = "$clockedOutMessage $timeAddedMessage")
             )
             _state.value = state.value.copy(
                 clockedInActivityId = null
@@ -114,6 +111,15 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
+    /** Compares DailyTime's timeSpent to the current max bar value, and returns the greatest  */
+    /*private fun getMaxBarValue(activity: Activity): Float {
+        val dailyTimeSpent = activity.dailyTimes.last().timeSpent
+        val stateMaxValue = _state.value.maxBarValue
+        return (if (dailyTimeSpent > stateMaxValue) dailyTimeSpent else stateMaxValue).toFloat()
+
+    }*/
+
+    /** */
     private fun performDeleteActivity(event: ActivityEvent.DeleteActivity) {
         viewModelScope.launch { ->
             val activity = event.activity
@@ -128,6 +134,7 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
+    /** */
     private fun performRestoreActivity() {
         viewModelScope.launch { ->
             activityUseCases.addActivity(activity = recentlyDeletedActivity ?: return@launch)
@@ -135,6 +142,7 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
+    /** */
     sealed class UiEvent {
         data class ShowSnackbar(val message: String): UiEvent()
         data class ShowSnackbarWithAction(val message: String, val action: String): UiEvent()
