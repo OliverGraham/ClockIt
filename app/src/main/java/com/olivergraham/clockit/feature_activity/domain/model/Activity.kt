@@ -1,12 +1,10 @@
 package com.olivergraham.clockit.feature_activity.domain.model
 
 import androidx.compose.ui.graphics.toArgb
-import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
+import com.olivergraham.clockit.feature_activity.utility.TimeLabels
 import com.olivergraham.clockit.ui.theme.*
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 
 data class Activity(
@@ -14,7 +12,7 @@ data class Activity(
     val color: Int = 0,
     val isClockedIn: Boolean = false,
     val lastClockIn: LocalDateTime? = null,
-    val timeSpent: Long = 0L,           // TODO: change to totalTimeSpent
+    val totalTimeSpent: Long = 0L,
     val dailyTimes: MutableList<DailyTime> = mutableListOf(),
     val id: Int? = null
 ) {
@@ -33,14 +31,8 @@ data class Activity(
     }
 
     companion object {
-
         val activityColors = listOf(RedOrange, LightGreen, Violet, BabyBlue, RedPink)
         fun getRandomColor(): Int = activityColors.random().toArgb()
-
-        // Label in this format:    Sep 16, 2022, 8:16:10 PM
-        private fun LocalDateTime.toLabel(): String = this.format(
-            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-        )
     }
 
     /** Return a message representing the total time spent in this activity */
@@ -48,10 +40,10 @@ data class Activity(
         if (lastClockIn == null) {
             return "Clock in to track time spent"
         }
-        if (timeSpent == 0L) {
+        if (totalTimeSpent == 0L) {
             return "Tracking time..."
         }
-        return "Total time spent:\n${TimeLabels.convertSecondsToLabel(timeSpent)}"
+        return "Total time spent:\n${TimeLabels.convertSecondsToLabel(totalSeconds = totalTimeSpent)}"
     }
 
     /** Return a message abut the status of the last clock-in  */
@@ -59,59 +51,44 @@ data class Activity(
         if (lastClockIn == null) {
             return "Clock in to get started!"
         }
-        return "Last clock in:\n${lastClockIn.toLabel()}"
+        return "Last clock in:\n${TimeLabels.dateTimeToLabel(dateTime = lastClockIn)}"
     }
 
     /** Copies and returns given activity, after adjusting some clock in fields */
     fun clockIn(): Activity {
 
-        val dateTime = LocalDateTime.now()
-        if (dailyTimes.isEmpty() || dailyTimeDifferentDate(dateTime)) {
-            addDailyTime(dateTime = dateTime)
+        val now = LocalDateTime.now()
+        if (dailyTimes.isEmpty() || dailyTimeDifferentDate(dateTime = now)) {
+            addDailyTime(dateTime = now)
         }
 
         return copy(
-            lastClockIn = dateTime,
+            lastClockIn = now,
             isClockedIn = true
         )
     }
 
-    // TODO: Save date of last clock out??
     /** Copies and returns given activity, after adjusting some clock out fields */
     fun clockOut(): Activity {
 
-        val dateTime = LocalDateTime.now()
-        val timeSpent = calculateTimeSpent(dateTime)
+        val now = LocalDateTime.now()
+        val totalTimeSpent = calculateTotalTimeSpent(dateTime = now)
 
-        if (dailyTimeDifferentDate(dateTime)) {
-            determineTimeOverMultipleDays()
+        if (dailyTimeDifferentDate(dateTime = now)) {
+            determineTimeOverMultipleDays(now = now, totalSeconds = totalTimeSpent)
         } else {
-            setDailyTimeSpent(time = calculateDailyTimeSpent(dateTime))
+            setDailyTimeSpent(time = calculateDailyTimeSpent(dateTime = now))
         }
-        // addTimeToYesterday()
+
         return copy(
-            timeSpent = timeSpent,
+            totalTimeSpent = totalTimeSpent,
             isClockedIn = false
         )
     }
 
-    /** Use to test! Currently, only works with one call */
-    private fun addTimeToYesterday() {
-
-        val yesterday = LocalDateTime.now().minusDays(1)
-        if (yesterday.toLocalDate() == dailyTimes.last().date?.toLocalDate()) return
-
-        addDailyTime(dateTime = yesterday)
-        setDailyTimeSpent(time = 45L)
-        val first = dailyTimes[0]
-        val second = dailyTimes[1]
-        dailyTimes[0] = second
-        dailyTimes[1] = first
-    }
-
     /** Calculate seconds between lastClockIn and given time, and add to running total */
-    private fun calculateTimeSpent(dateTime: LocalDateTime): Long =
-        Duration.between(lastClockIn, dateTime).seconds + timeSpent
+    private fun calculateTotalTimeSpent(dateTime: LocalDateTime): Long =
+        Duration.between(lastClockIn, dateTime).seconds + totalTimeSpent
 
     /** Calculate seconds between lastClockIn and given time,
      *  and add to running total for current day
@@ -136,19 +113,18 @@ data class Activity(
     /** If user has been clocked in over multiple days,
      *  determine how many seconds to add to each day
      * */
-    private fun determineTimeOverMultipleDays() {
+    private fun determineTimeOverMultipleDays(now: LocalDateTime, totalSeconds: Long) {
 
-        val totalSeconds = Duration.between(lastClockIn, LocalDateTime.now()).seconds
-        val lastClockInToMidnightThatDay = fromTimeToMidnight(lastClockIn).seconds
+        val lastClockInToMidnightThatDay = fromTimeToMidnight(time = lastClockIn).seconds
         setDailyTimeSpent(time = lastClockInToMidnightThatDay)
 
         // Now, add new days
         var remainderSeconds = totalSeconds - lastClockInToMidnightThatDay
         val totalDays = remainderSeconds / TimeLabels.SECONDS_IN_DAY
 
-        addDays(totalDays)
+        addDays(totalDays = totalDays)
         remainderSeconds -= TimeLabels.SECONDS_IN_DAY * totalDays
-        addFinalDay(remainderSeconds)
+        addFinalDay(now = now, secondsToAdd = remainderSeconds)
     }
 
     /** Return a Duration from the given time up to midnight that (same) day
@@ -162,17 +138,17 @@ data class Activity(
     private fun addDays(totalDays: Long) {
         if (lastClockIn != null) {
             for (day in 1..totalDays) {
-                addDailyTime(lastClockIn.plusDays(day))
-                setDailyTimeSpent(TimeLabels.SECONDS_IN_DAY)
+                addDailyTime(dateTime = lastClockIn.plusDays(day))
+                setDailyTimeSpent(time = TimeLabels.SECONDS_IN_DAY)
             }
         }
     }
 
     /** Add remaining seconds to current day */
-    private fun addFinalDay(remainderSeconds: Long) {
-        if (remainderSeconds > 0) {
-            addDailyTime(LocalDateTime.now())
-            setDailyTimeSpent(remainderSeconds)
+    private fun addFinalDay(now: LocalDateTime ,secondsToAdd: Long) {
+        if (secondsToAdd > 0) {
+            addDailyTime(dateTime = now)
+            setDailyTimeSpent(time = secondsToAdd)
         }
     }
 }

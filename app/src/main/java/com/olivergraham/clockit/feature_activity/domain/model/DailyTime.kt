@@ -8,19 +8,10 @@ data class DailyTime(
     val date: LocalDateTime?
 ) {
 
-    /** Return the date's month/day as a string */
+    /** Return the date's month/day as a string, or "Today" */
     fun monthDay(): String {
         val theDate = date?.toLocalDate()
         val fullDate = "${theDate?.monthValue}/${theDate?.dayOfMonth}"
         return if (theDate == LocalDate.now()) "Today" else fullDate
-    }
-
-    companion object {
-        fun areDatesEqual(lhs: LocalDateTime?, rhs: LocalDateTime?): Boolean {
-            if (lhs == null || rhs == null) {
-                return false
-            }
-            return lhs == rhs
-        }
     }
 }

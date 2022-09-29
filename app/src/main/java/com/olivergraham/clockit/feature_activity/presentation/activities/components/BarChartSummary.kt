@@ -12,12 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.olivergraham.clockit.feature_activity.domain.model.Activity
 import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
-import com.olivergraham.clockit.feature_activity.presentation.utility.TimeLabels
+import com.olivergraham.clockit.feature_activity.utility.TimeLabels
 import com.olivergraham.clockit.ui.theme.getFontSize
 import me.bytebeats.views.charts.bar.BarChart
 import me.bytebeats.views.charts.bar.BarChartData
 import me.bytebeats.views.charts.bar.render.label.SimpleLabelDrawer
-import me.bytebeats.views.charts.bar.render.xaxis.IXAxisDrawer
 import me.bytebeats.views.charts.bar.render.xaxis.SimpleXAxisDrawer
 import me.bytebeats.views.charts.bar.render.yaxis.SimpleYAxisDrawer
 

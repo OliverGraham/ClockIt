@@ -1,7 +1,6 @@
 package com.olivergraham.clockit.feature_activity.presentation.utility
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.olivergraham.clockit.feature_activity.domain.model.Activity

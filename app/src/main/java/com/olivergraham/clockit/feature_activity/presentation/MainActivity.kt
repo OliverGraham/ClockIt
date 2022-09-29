@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** Setup NavHost screens and arguments */
 @Composable
 private fun MainContent() {
     val navController = rememberNavController()
@@ -63,6 +64,7 @@ private fun MainContent() {
     }
 }
 
+/** Named arguments boilerplate */
 private fun getAddEditScreenArguments(): List<NamedNavArgument> {
     return listOf(
         navArgument(

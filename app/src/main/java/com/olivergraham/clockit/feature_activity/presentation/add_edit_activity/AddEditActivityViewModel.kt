@@ -1,6 +1,5 @@
 package com.olivergraham.clockit.feature_activity.presentation.add_edit_activity
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -46,11 +45,11 @@ class AddEditActivityViewModel @Inject constructor(
         initializeActivity()
     }
 
+    /** Populate screen with navigation argument, if there is one */
     private fun initializeActivity() {
         savedStateHandle.getActivityId()?.let { activityId ->
             if (activityId != -1) {
                 viewModelScope.launch { ->
-
                     currentActivity = withContext(Dispatchers.IO) { ->
                         activityUseCases.getActivity(activityId)
                     }
@@ -60,6 +59,7 @@ class AddEditActivityViewModel @Inject constructor(
         }
     }
 
+    /** Populate activity fields with navigation argument */
     private fun setScreenActivity(activity: Activity) {
         currentActivityId = activity.id
         activityTextFieldState = activityTextFieldState.copy(
@@ -69,12 +69,14 @@ class AddEditActivityViewModel @Inject constructor(
         activityColor = activity.color
     }
 
+    /** Copy relevant state */
     private fun setActivityTextFieldName(newText: String) {
         activityTextFieldState = activityTextFieldState.copy(
             text = newText
         )
     }
 
+    /** Copy relevant state */
     private fun setActivityTextFieldFocusState(focusState: FocusState) {
         activityTextFieldState = activityTextFieldState.copy(
             isHintVisible = !focusState.isFocused &&
@@ -82,6 +84,7 @@ class AddEditActivityViewModel @Inject constructor(
         )
     }
 
+    /** Save or update activity */
     private fun manageSaveActivity() {
         viewModelScope.launch { ->
             try {
@@ -97,6 +100,7 @@ class AddEditActivityViewModel @Inject constructor(
         }
     }
 
+    /** Update given activity in database */
     private suspend fun updateActivity() {
         currentActivity?.let { activity ->
             activityUseCases.updateActivity(
@@ -108,6 +112,7 @@ class AddEditActivityViewModel @Inject constructor(
         }
     }
 
+    /** Save new activity in database */
     private suspend fun saveActivity() {
         activityUseCases.addActivity(
             Activity(
@@ -119,6 +124,7 @@ class AddEditActivityViewModel @Inject constructor(
     }
 
 
+    /** Handle user-directed events */
     fun onEvent(event: AddEditActivityEvent) {
         when (event) {
             is AddEditActivityEvent.EnteredTitle -> {

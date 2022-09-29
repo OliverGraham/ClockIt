@@ -1,6 +1,9 @@
-package com.olivergraham.clockit.feature_activity.presentation.utility
+package com.olivergraham.clockit.feature_activity.utility
 
 import com.olivergraham.clockit.feature_activity.domain.model.DailyTime
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 object TimeLabels {
     const val SECONDS_IN_DAY = 86400L
@@ -51,6 +54,12 @@ object TimeLabels {
         }
     }
 
+    // Label in this format:    Sep 16, 2022, 8:16:10 PM
+    fun dateTimeToLabel(dateTime: LocalDateTime): String = dateTime.format(
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+    )
+
+    /** Will possibly have future use */
     fun secondsToHighestUnitLabel(time: Long): String {
         return if (time <= SECONDS_IN_MINUTE) {
             "seconds"
@@ -82,11 +91,7 @@ object TimeLabels {
             return minutesTriple(rawTime = rawTime)
         }
 
-        if (rawTime < SECONDS_IN_DAY) {
-            return hoursTriple(rawTime = rawTime)
-        }
-
-        return daysTriple(rawTime = rawTime)
+        return hoursTriple(rawTime = rawTime)
     }
 
     /** Return the relevant Triple...
@@ -101,7 +106,7 @@ object TimeLabels {
             third = "Seconds"
     )
 
-    /** */
+    /** Return the relevant Triple... */
     private fun minutesTriple(rawTime: Long): Triple<Float, Float, String> = Triple(
         first = SECONDS_IN_MINUTE.toFloat(),
         second = determineMaxBarValue(
@@ -111,10 +116,18 @@ object TimeLabels {
         third = "Minutes"
     )
 
-    /** */
+    /** Return the relevant Triple... */
     private fun hoursTriple(rawTime: Long): Triple<Float, Float, String> {
+
         val currentHours = rawTime.toHours()
-        val yAxisMaxBarValue = if (currentHours > 6L) currentHours else 6L
+        val yAxisMaxBarValue = if (currentHours == 24L) {
+            currentHours
+        } else if (currentHours >= 6L) {
+            currentHours + 1
+        } else {
+            6L
+        }
+
         return Triple(
             first = SECONDS_IN_HOUR.toFloat(),
             second = determineMaxBarValue(
@@ -135,10 +148,9 @@ object TimeLabels {
         third = "Days"
     )
 
+    /** Make the max bar 30 seconds, 30 minutes, etc. if rawTime is less than 30 */
     private fun determineMaxBarValue(rawTime: Long, threshold: Long, divisor: Long = 2L): Float {
         val reducedTime = threshold / divisor
         return if (rawTime <= reducedTime) reducedTime.toFloat() else threshold.toFloat()
     }
-
-
 }

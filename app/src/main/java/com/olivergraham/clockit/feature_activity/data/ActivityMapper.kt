@@ -12,7 +12,7 @@ fun ActivityEntity.toActivity(): Activity {
         color = color,
         isClockedIn = isClockedIn,
         lastClockIn = lastClockIn.toLocalDateTime(),
-        timeSpent = timeSpent,
+        totalTimeSpent = totalTimeSpent,
         dailyTimes = dailyTimes.convertLocalDateTimes(),
         id = id
     )
@@ -24,7 +24,7 @@ fun Activity.toActivityEntity(): ActivityEntity {
         color = color,
         isClockedIn = isClockedIn,
         lastClockIn = lastClockIn?.toString() ?: "",
-        timeSpent = timeSpent,
+        totalTimeSpent = totalTimeSpent,
         dailyTimes = dailyTimes.toEntities(),
         id = id
     )

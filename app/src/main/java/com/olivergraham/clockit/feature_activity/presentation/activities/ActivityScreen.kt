@@ -18,22 +18,16 @@ import com.olivergraham.clockit.feature_activity.presentation.utility.navigateWi
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
-
+/** Screen containing Activity cards */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityScreen(
     navController: NavController,
     activityViewModel: ActivityViewModel = hiltViewModel()
 ) {
-
     // TODO: Currently, this causes a lot of recompositions. How to improve?
     val state = activityViewModel.state.value
     val activities = state.activities
-
-    // determine if an activity is already clocked in
-    /*val clockedInActivity by remember(activities) {
-        derivedStateOf { activities.firstOrNull { activity -> activity.isClockedIn } }
-    }*/
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -82,7 +76,7 @@ fun ActivityScreen(
     }
 }
 
-
+/** Subscribe to the view model's event flow and respond accordingly */
 @Composable
 private fun ObserveUiEvents(
     eventFlow: SharedFlow<ActivityViewModel.UiEvent>,

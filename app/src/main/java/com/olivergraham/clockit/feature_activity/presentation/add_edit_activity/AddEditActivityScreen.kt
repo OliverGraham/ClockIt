@@ -21,6 +21,7 @@ import com.olivergraham.clockit.feature_activity.presentation.common_components.
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
+/** Screen to add a new activity, or edit an existing one */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditActivityScreen(
@@ -80,7 +81,7 @@ fun AddEditActivityScreen(
 }
 
 
-
+/** Subscribe to the view model's event flow and respond accordingly */
 @Composable
 private fun ObserveUiEvents(
     eventFlow: SharedFlow<AddEditActivityViewModel.UiEvent>,
